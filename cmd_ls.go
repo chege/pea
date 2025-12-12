@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
 )
 
@@ -61,11 +62,11 @@ func ensureStore() (string, error) {
 	if _, err := os.Stat(cfg); os.IsNotExist(err) {
 		_ = os.WriteFile(cfg, []byte("# pea config\n# store_dir = \""+store+"\"\n"), 0o644)
 	}
-	// Read config.toml for store_dir if present (simple parse)
-	b, err := os.ReadFile(cfg)
-	if err == nil {
-		if dir := parseStoreDir(string(b)); dir != "" {
-			store = dir
+	// Read config.toml for store_dir using TOML parser if available
+	var conf struct{ StoreDir string `toml:"store_dir"` }
+	if _, err := toml.DecodeFile(cfg, &conf); err == nil {
+		if conf.StoreDir != "" {
+			store = conf.StoreDir
 			_ = os.MkdirAll(store, 0o755)
 		}
 	}
