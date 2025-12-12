@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
+
+	clipboard "golang.design/x/clipboard"
 )
 
 func readEntry(store, name string) ([]byte, error) {
@@ -42,18 +42,10 @@ func isTTY() bool {
 }
 
 func copyToClipboard(s string) error {
-	// macOS: use pbcopy via exec.Command
-	c := exec.Command("bash", "-c", "pbcopy")
-	in, err := c.StdinPipe()
-	if err != nil {
+	// Cross-platform clipboard via golang.design/x/clipboard
+	if err := clipboard.Init(); err != nil {
 		return err
 	}
-	if err := c.Start(); err != nil {
-		return err
-	}
-	if _, err := io.WriteString(in, s); err != nil {
-		return err
-	}
-	in.Close()
-	return c.Wait()
+	clipboard.Write(clipboard.FmtText, []byte(s))
+	return nil
 }

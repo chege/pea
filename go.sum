@@ -10,4 +10,14 @@ github.com/spf13/pflag v1.0.9/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An
 github.com/spf13/pflag v1.0.10 h1:4EBh2KAYBwaONj6b2Ye1GiHfwjqyROoF4RwYO+vPwFk=
 github.com/spf13/pflag v1.0.10/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
+golang.design/x/clipboard v0.7.1 h1:OEG3CmcYRBNnRwpDp7+uWLiZi3hrMRJpE9JkkkYtz2c=
+golang.design/x/clipboard v0.7.1/go.mod h1:i5SiIqj0wLFw9P/1D7vfILFK0KHMk7ydE72HRrUIgkg=
+golang.org/x/exp/shiny v0.0.0-20251209150349-8475f28825e9 h1:1YSucehq04trv319rsDF5J8nPy8z220KRunz0Wgbi3w=
+golang.org/x/exp/shiny v0.0.0-20251209150349-8475f28825e9/go.mod h1:QqbL1+y9e9D0Su+B9umI12TlEFXxVNGTpUai4t0pvgI=
+golang.org/x/image v0.34.0 h1:33gCkyw9hmwbZJeZkct8XyR11yH889EQt/QH4VmXMn8=
+golang.org/x/image v0.34.0/go.mod h1:2RNFBZRB+vnwwFil8GkMdRvrJOFd1AzdZI6vOY+eJVU=
+golang.org/x/mobile v0.0.0-20251209145715-2553ed8ce294 h1:Cr6kbEvA6nqvdHynE4CtVKlqpZB9dS1Jva/6IsHA19g=
+golang.org/x/mobile v0.0.0-20251209145715-2553ed8ce294/go.mod h1:RdZ+3sb4CVgpCFnzv+I4haEpwqFfsfzlLHs3L7ok+e0=
+golang.org/x/sys v0.39.0 h1:CvCKL8MeisomCi6qNZ+wbb0DN9E5AATixKsvNtMoMFk=
+golang.org/x/sys v0.39.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
