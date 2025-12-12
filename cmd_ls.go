@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -60,6 +61,12 @@ func ensureStore() (string, error) {
 			store = dir
 			_ = os.MkdirAll(store, 0o755)
 		}
+	}
+	// Initialize git repo if missing (for versioning of entries)
+	if _, err := os.Stat(filepath.Join(store, ".git")); os.IsNotExist(err) {
+		_ = exec.Command("bash", "-c", "cd '"+store+"' && git init").Run()
+		_ = exec.Command("bash", "-c", "cd '"+store+"' && git config user.name 'pea'").Run()
+		_ = exec.Command("bash", "-c", "cd '"+store+"' && git config user.email 'pea@example.com'").Run()
 	}
 	return store, nil
 }

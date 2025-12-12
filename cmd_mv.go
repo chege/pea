@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -23,6 +24,8 @@ func addMoveCommand(root *cobra.Command) {
 			if err := os.Rename(oldPath, newPath); err != nil {
 				return fmt.Errorf("rename failed: %w", err)
 			}
+			// git add new and commit (best-effort)
+			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+".txt' && git commit -m 'mv "+oldName+" -> "+newName+"'").Run()
 			fmt.Fprintln(cmd.OutOrStdout(), newName)
 			return nil
 		},
