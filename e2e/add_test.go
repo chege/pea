@@ -9,14 +9,12 @@ import (
 )
 
 func TestAddViaStdin(t *testing.T) {
-	bin := filepath.Join("..", "bin", "pea")
-	// Ensure binary exists
-	if _, err := os.Stat(bin); err != nil {
-		cmd := exec.Command("go", "build", "-o", bin, ".")
-		cmd.Dir = filepath.Join("..")
-		if out, err := cmd.CombinedOutput(); err != nil {
-			t.Fatalf("build failed: %v\n%s", err, out)
-		}
+	root := filepath.Join("..")
+	bin := filepath.Join(root, "bin", "pea")
+	build := exec.Command("go", "build", "-o", bin, ".")
+	build.Dir = root
+	if out, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build failed: %v\n%s", err, out)
 	}
 	cmd := exec.Command(bin, "add", "hello_world")
 	cmd.Stdin = strings.NewReader("Hello world\n")

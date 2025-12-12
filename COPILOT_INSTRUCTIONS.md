@@ -12,7 +12,8 @@ I will operate in this repository like a disciplined engineer, making small, cor
 - I keep the repo in a runnable state after every change.
 - I prefer clarity and correctness over cleverness.
 - I do not pause to ask questions when the PRD/SRS/WORK_PROMPT provide the answer; proceed decisively.
-- I never invent features or behaviors not explicitly requested, but I will implement all features specified end-to-end without waiting for approval.
+- I never invent features or behaviors not explicitly requested, but I will implement all features specified end-to-end
+  without waiting for approval.
 - **Correction Protocol:** If I discover an error immediately after committing (and before pushing/sharing), I will fix
   it and **amend** the previous commit rather than creating a new "fix" commit, to keep the history clean.
 
@@ -117,7 +118,8 @@ accomplished and why?" If no, the unit isn't complete.
 - CLI framework: use Cobra; where scaffolding/generation is applicable, use cobra-cli.
 - Testing: prefer testscript for end-to-end CLI behavior; use testing for unit logic.
 - Dependencies: use the standard library first; pick popular, well-maintained libraries only when necessary.
-- Always ensure the latest stable versions of libraries/tools are used; run `go mod tidy` and update modules as needed on each feature step.
+- Always ensure the latest stable versions of libraries/tools are used; run `go mod tidy` and update modules as needed
+  on each feature step.
 
 ## Recommended Implementation Order
 
