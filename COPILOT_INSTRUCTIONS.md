@@ -125,6 +125,7 @@ accomplished and why?" If no, the unit isn't complete.
 - CLI framework: use Cobra; where scaffolding/generation is applicable, use cobra-cli.
 - Testing: prefer testscript for end-to-end CLI behavior; use testing for unit logic.
 - Dependencies: use the standard library first; pick popular, well-maintained libraries only when necessary.
+- Always ensure the latest stable versions of libraries/tools are used; run `go mod tidy` and update modules as needed on each feature step.
 
 ## Recommended Implementation Order
 
