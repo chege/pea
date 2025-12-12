@@ -55,7 +55,7 @@ Follow this loop for every change, automatically and continuously:
 
 What Makes a Good Unit:
 
-- A complete command with its tests (unit and/or e2e) and docs when applicable
+- A complete, user-visible feature slice (e.g., a command, endpoint, or workflow) with tests and docs when applicable
 - Brings value: adds something useful or fixes something broken
 - Tells a story: reader understands what changed and why
 - Stands alone: makes sense without other commits
@@ -116,11 +116,11 @@ accomplished and why?" If no, the unit isn't complete.
 
 **Examples:**
 
-- `feat: add command skeleton for 'pea add'`
-- `feat(config): implement TOML config file parsing`
+- `feat: add command skeleton for add`
+- `feat(config): implement config file parsing`
 - `fix: handle missing file gracefully with error message`
 - `refactor: extract validation logic into separate function`
-- `test: add integration tests for list command`
+- `test: add integration tests for list feature`
 - `docs: update README with installation instructions`
 
 **Guidelines:**
@@ -131,42 +131,33 @@ accomplished and why?" If no, the unit isn't complete.
 - One logical concept per commit
 - Avoid vague messages like "wip", "update", "fix stuff"
 
-## Project Context (pea)
+## Technology Preferences (Generic)
 
-- Language: Go (module: pea, go 1.25).
-- Current files: go.mod, main.go.
-- Status: main.go prints a welcome message and demonstrates a loop.
+- Prefer the standard library first; add popular, well-maintained libraries only when necessary.
+- Keep dependencies at the latest stable versions; update modules/packages regularly as features land.
+- Testing: write unit tests for core logic and end-to-end/integration tests for user-visible behavior, using the ecosystem's standard test tools.
 
-## Technology Stack and Preferences
+## Recommended Implementation Order (Generic)
 
-- CLI framework: use Cobra; where scaffolding/generation is applicable, use cobra-cli.
-- Testing: prefer testscript for end-to-end CLI behavior; use testing for unit logic.
-- Dependencies: use the standard library first; pick popular, well-maintained libraries only when necessary.
-- Always ensure the latest stable versions of libraries/tools are used; run `go mod tidy` and update modules as needed
-  on each feature step.
+1. **Bootstrap:** Ensure a minimal runnable application.
+2. **Core Helpers:** Establish error handling, configuration, and platform abstractions.
+3. **Primary Features:** Implement features iteratively in small, test-backed units.
+4. **UX Polish:** Refine messages, exit codes, and output formatting.
+5. **Platform Integration:** Provide necessary integrations (e.g., completion, plugins, adapters) as applicable.
 
-## Recommended Implementation Order
+## Coding Style (Generic)
 
-1. **Bootstrap:** Ensure minimal runnable binary; initialize CLI framework.
-2. **Core Helpers:** Establish error handling patterns and config reading.
-3. **Primary Commands:** Implement command structure (e.g., `add`, `retrieve`, `list`) iteratively.
-4. **UX Polish:** Refine error messages, exit codes, and output formatting.
-5. **Completion:** Generate shell completions and installation docs.
-
-## Coding Style
-
-- Write idiomatic Go: simple, explicit code; short functions.
+- Write idiomatic code for the chosen language: simple, explicit, and readable; keep functions focused.
 - Handle errors explicitly and fail fast with helpful messages.
-- Avoid premature abstractions; copy-paste is better than a wrong abstraction.
+- Avoid premature abstractions; favor clarity over cleverness.
 
-## Verification
+## Verification (Generic)
 
-- Every commit must compile (go build ./...) and pass tests (go test ./...).
+- Every commit must build and pass tests using the project's standard tooling (e.g., just/make/npm scripts/etc.).
 - Test strategy:
-    - Unit tests: critical internal logic/algorithms.
-    - Integration tests: use testscript (or similar) to verify end-to-end CLI behavior (flags, exit codes, output).
-- Execution: go run ./... (or specific command).
-- Automation: if a Taskfile exists, use task-defined tasks (e.g., task build, task test) for consistency.
+    - Unit tests for critical internal logic.
+    - Integration/E2E tests to verify end-to-end behavior (commands/endpoints/flows).
+- Use existing project tasks (e.g., build/test scripts) when available for consistency.
 
 ## When Unsure
 
