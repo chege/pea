@@ -39,6 +39,11 @@ func ensureStore() (string, error) {
 		if err := os.MkdirAll(v, 0o755); err != nil {
 			return "", err
 		}
+		if _, err := os.Stat(filepath.Join(v, ".git")); os.IsNotExist(err) {
+			_ = exec.Command("bash", "-c", "cd '"+v+"' && git init").Run()
+			_ = exec.Command("bash", "-c", "cd '"+v+"' && git config user.name 'pea'").Run()
+			_ = exec.Command("bash", "-c", "cd '"+v+"' && git config user.email 'pea@example.com'").Run()
+		}
 		return v, nil
 	}
 	home, err := os.UserHomeDir()

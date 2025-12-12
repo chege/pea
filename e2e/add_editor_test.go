@@ -31,6 +31,10 @@ func TestAddOpensEditorWhenNoStdin(t *testing.T) {
 	home, _ := os.UserHomeDir()
 	store := filepath.Join(home, ".pea", "prompts", "edited_entry.txt")
 	b, err := os.ReadFile(store)
-	if err != nil { t.Fatalf("missing entry: %v", err) }
-	if string(b) != "edited\n" { t.Fatalf("unexpected content: %q", string(b)) }
+	if err != nil {
+		t.Fatalf("missing entry: %v", err)
+	}
+	if string(b) != "edited\n" {
+		t.Fatalf("unexpected content: %q", string(b))
+	}
 }

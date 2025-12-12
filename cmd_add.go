@@ -44,14 +44,18 @@ func addAddCommand(root *cobra.Command) {
 					}
 					// Ensure file exists before opening editor
 					if _, err := os.Stat(path); os.IsNotExist(err) {
-						if err := os.WriteFile(path, []byte{}, 0o644); err != nil { return err }
+						if err := os.WriteFile(path, []byte{}, 0o644); err != nil {
+							return err
+						}
 					}
 					// Launch editor; content handled by editor, then print name and exit
-					c := exec.Command("bash", "-lc", ed+" \""+path+"\"")
+					c := exec.Command("bash", "-c", ed+" \""+path+"\"")
 					c.Stdin = os.Stdin
 					c.Stdout = cmd.OutOrStdout()
 					c.Stderr = cmd.ErrOrStderr()
-					if err := c.Run(); err != nil { return err }
+					if err := c.Run(); err != nil {
+						return err
+					}
 					fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
 					return nil
 				}
@@ -63,6 +67,8 @@ func addAddCommand(root *cobra.Command) {
 			if err := os.WriteFile(path, data, 0o644); err != nil {
 				return err
 			}
+			// git add + commit
+			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+name+".txt' && git commit -m 'add "+name+"'").Run()
 			fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
 			return nil
 		},
