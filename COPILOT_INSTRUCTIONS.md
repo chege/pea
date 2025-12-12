@@ -16,25 +16,17 @@ I will operate in this repository like a disciplined engineer, making small, cor
 - **Correction Protocol:** If I discover an error immediately after committing (and before pushing/sharing), I will fix
   it and **amend** the previous commit rather than creating a new "fix" commit, to keep the history clean.
 
-## Workflow Loop
+## Workflow Loop (Automated Continuous Mode)
 
-Follow this loop for every change:
+Follow this loop for every change, automatically and continuously:
 
-1. **Inspect** — Review current state: read relevant files, check build status, understand existing behavior
-2. **Plan** — Identify the smallest **complete** logical unit
-    - Ask: "What's the next valuable chapter in the story?"
-    - Ask: "Can this stand alone and make sense?"
-    - Write down: "This commit will add/fix/improve [specific thing]"
-3. **Implement** — Make only that planned change; resist scope creep
-    - If you think "while I'm here, I'll also...", STOP
-    - Save that "also" for the next commit
-4. **Verify** — Build and test: `go build ./...` and `go test ./...` must succeed
-5. **Commit** — Write a clear message that tells the story of this change
-    - Someone reading just this commit should understand what value it adds
-6. **Review** — Check the diff; ensure only intended files changed
-    - Ask: "Does this diff tell a clear story?"
-    - Ask: "Is anything here unrelated to the commit message?"
-7. **Repeat** — Move to the next logical unit in the story
+1. **Inspect** — Read PRD/SRS/WORK_PROMPT and current code.
+2. **Plan** — Pick the next smallest complete unit (a command with tests).
+3. **Implement** — Code only that unit.
+4. **Verify** — Run `just build`/`go build` and `just test`/`go test`; fix failures.
+5. **Commit** — Conventional Commit message; commit immediately after passing.
+6. **Review** — Self-check the diff; ensure only intended files changed.
+7. **Continue** — Immediately proceed to the next unit with no pauses or approvals until the app is complete.
 
 What Makes a Good Unit:
 
