@@ -1,0 +1,15 @@
+# Local IDE settings
+.idea/
+
+# Ignore Copilot instructions
+COPILOT_INSTRUCTIONS.md
+
+# VS Code
+.vscode/
+
+# JetBrains project files
+*.iml
+
+# Project docs not tracked in git
+SRS.md
+WORK_PROMPT.md
