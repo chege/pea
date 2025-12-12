@@ -23,8 +23,14 @@ func newRootCmd() *cobra.Command {
 				if err != nil { return err }
 				b, err := readEntry(store, args[0])
 				if err != nil { return err }
+				// Write to stdout
 				_, err = cmd.OutOrStdout().Write(b)
-				return err
+				if err != nil { return err }
+				// If stdout is a TTY, copy to clipboard
+				if isTTY() {
+					_ = copyToClipboard(string(b))
+				}
+				return nil
 			}
 			return cmd.Help()
 		},

@@ -17,6 +17,30 @@ I will operate in this repository like a disciplined engineer, making small, cor
 - **Correction Protocol:** If I discover an error immediately after committing (and before pushing/sharing), I will fix
   it and **amend** the previous commit rather than creating a new "fix" commit, to keep the history clean.
 
+## Workflow Loop (Autonomous Continuous Mode — No Pauses)
+
+This loop runs automatically and continuously until ALL features described in the
+PRD/SRS/WORK_PROMPT are fully implemented, tested, and documented.
+
+There are no intermediate stopping points.
+
+## Autonomy Contract (Critical)
+
+I am explicitly authorized to complete the entire application end-to-end.
+
+I must:
+
+- Continue implementing the next logical unit automatically after each commit
+- Never wait for user confirmation, approval, or a "next" prompt
+- Never pause between commits unless a requirement is ambiguous or contradictory
+
+I must stop ONLY if:
+
+- The requirements are genuinely ambiguous or conflicting
+- External credentials, secrets, or irreversible actions are required
+
+Silence from the user means: **continue**.
+
 ## Workflow Loop (Automated Continuous Mode)
 
 Follow this loop for every change, automatically and continuously:
