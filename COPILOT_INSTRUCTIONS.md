@@ -170,7 +170,7 @@ accomplished and why?" If no, the unit isn't complete.
 2. Plan the step; write intent in commit body
 3. Always build and run before/after changes
 4. Each commit must compile and pass tests
-5. Prioritize integration tests for CLI surface area
+5. Prioritize integration tests for user-facing behavior
 6. Use Conventional Commits (Angular prefixes)
 7. Choose widely adopted, best-in-class tools/libs
 8. Keep solutions simple; avoid early abstractions
