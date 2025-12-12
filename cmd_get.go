@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 func readEntry(store, name string) ([]byte, error) {
@@ -15,7 +16,21 @@ func readEntry(store, name string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("not found: %s", name)
 	}
-	return b, nil
+	return stripFrontMatter(b), nil
+}
+
+// stripFrontMatter removes simple YAML front matter delimited by lines starting with '---'.
+func stripFrontMatter(b []byte) []byte {
+	lines := strings.Split(string(b), "\n")
+	if len(lines) > 0 && strings.TrimSpace(lines[0]) == "---" {
+		// find closing '---'
+		for i := 1; i < len(lines); i++ {
+			if strings.TrimSpace(lines[i]) == "---" {
+				return []byte(strings.Join(lines[i+1:], "\n"))
+			}
+		}
+	}
+	return b
 }
 
 func isTTY() bool {
