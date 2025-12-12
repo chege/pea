@@ -36,7 +36,9 @@ func addListCommand(root *cobra.Command) {
 func ensureStore() (string, error) {
 	// Env override
 	if v := os.Getenv("PEA_STORE"); v != "" {
-		if err := os.MkdirAll(v, 0o755); err != nil { return "", err }
+		if err := os.MkdirAll(v, 0o755); err != nil {
+			return "", err
+		}
 		return v, nil
 	}
 	home, err := os.UserHomeDir()
@@ -79,7 +81,9 @@ func parseStoreDir(s string) string {
 			if len(parts) == 2 {
 				v := strings.TrimSpace(parts[1])
 				v = strings.Trim(v, "\"'")
-				if v != "" { return v }
+				if v != "" {
+					return v
+				}
 			}
 		}
 	}
@@ -93,7 +97,9 @@ func listEntries(store string) ([]string, error) {
 	}
 	var names []string
 	for _, f := range files {
-		if f.IsDir() { continue }
+		if f.IsDir() {
+			continue
+		}
 		name := f.Name()
 		if strings.HasSuffix(name, ".txt") {
 			name = strings.TrimSuffix(name, ".txt")

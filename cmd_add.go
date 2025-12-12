@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -19,26 +20,49 @@ func addAddCommand(root *cobra.Command) {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := ensureStore()
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			name := toSnake(args[0])
 			path := filepath.Join(store, name+".txt")
 			var src io.Reader
 			if len(args) > 1 {
 				f, err := os.Open(args[1])
-				if err != nil { return err }
+				if err != nil {
+					return err
+				}
 				defer f.Close()
 				src = f
 			} else {
-				// If stdin has data, read it; else require EDITOR and open it is non-trivial, so for v0 read stdin or error.
+				// If stdin has data, read it; else open $EDITOR for the target path
 				if isInputFromPipe() {
 					src = bufio.NewReader(os.Stdin)
 				} else {
-					return fmt.Errorf("no input provided: supply a file or pipe stdin")
+					ed := os.Getenv("EDITOR")
+					if ed == "" {
+						return fmt.Errorf("$EDITOR is not set; set EDITOR or pipe stdin")
+					}
+					// Ensure file exists before opening editor
+					if _, err := os.Stat(path); os.IsNotExist(err) {
+						if err := os.WriteFile(path, []byte{}, 0o644); err != nil { return err }
+					}
+					// Launch editor; content handled by editor, then print name and exit
+					c := exec.Command("bash", "-lc", ed+" \""+path+"\"")
+					c.Stdin = os.Stdin
+					c.Stdout = cmd.OutOrStdout()
+					c.Stderr = cmd.ErrOrStderr()
+					if err := c.Run(); err != nil { return err }
+					fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+					return nil
 				}
 			}
 			data, err := io.ReadAll(src)
-			if err != nil { return err }
-			if err := os.WriteFile(path, data, 0o644); err != nil { return err }
+			if err != nil {
+				return err
+			}
+			if err := os.WriteFile(path, data, 0o644); err != nil {
+				return err
+			}
 			fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
 			return nil
 		},
@@ -57,6 +81,8 @@ func toSnake(s string) string {
 
 func isInputFromPipe() bool {
 	fi, err := os.Stdin.Stat()
-	if err != nil { return false }
+	if err != nil {
+		return false
+	}
 	return (fi.Mode() & os.ModeCharDevice) == 0
 }

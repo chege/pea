@@ -16,7 +16,9 @@ func addMoveCommand(root *cobra.Command) {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := ensureStore()
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			oldName := toSnake(args[0])
 			newName := toSnake(args[1])
 			oldPath := filepath.Join(store, oldName+".txt")

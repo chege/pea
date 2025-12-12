@@ -16,7 +16,9 @@ func addRemoveCommand(root *cobra.Command) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := ensureStore()
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			name := toSnake(args[0])
 			path := filepath.Join(store, name+".txt")
 			if err := os.Remove(path); err != nil {
