@@ -55,7 +55,7 @@ Follow this loop for every change, automatically and continuously:
 
 What Makes a Good Unit:
 
-- A complete, user-visible feature slice (e.g., a command, endpoint, or workflow) with tests and docs when applicable
+- A complete, user-visible feature slice (e.g., a component, module, or workflow) with tests and docs when applicable
 - Brings value: adds something useful or fixes something broken
 - Tells a story: reader understands what changed and why
 - Stands alone: makes sense without other commits
