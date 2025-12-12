@@ -34,25 +34,25 @@ lint:
   if command -v staticcheck >/dev/null 2>&1; then staticcheck ./...; else echo "staticcheck not installed, skipping"; fi
 
 # Tidy module dependencies
- tidy:
+tidy:
   go mod tidy
 
 # Run tests (add e2e tests under ./e2e when available)
- test:
+test:
   go test ./...
 
 # End-to-end tests, if ./e2e exists
- e2e:
+e2e:
   if [ -d "e2e" ]; then go test -v ./e2e; else echo "No e2e tests yet"; fi
 
 # Aggregate checks required by the process
- check: fmt vet test
+check: fmt vet test
   @echo "check: fmt, vet, test passed"
 
 # Pre-commit hook runner
- pre-commit: check
+pre-commit: check
   @echo "pre-commit checks complete"
 
 # Clean build artifacts
- clean:
+clean:
   rm -rf bin
