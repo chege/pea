@@ -38,12 +38,15 @@ func init() {
 }
 
 func initImpls() {
+
 	if os.Getenv("PEA_HEADLESS") != "" {
+
 		// In test/headless mode, use fakes that do not require OS services.
 		ClipboardImpl = &fakeClipboard{}
 		BrowserImpl = &fakeBrowser{}
 		return
 	}
+
 	// Default real implementations
 	ClipboardImpl = &realClipboard{}
 	BrowserImpl = &realBrowser{}
@@ -74,16 +77,21 @@ type fakeClipboard struct{}
 func (f *fakeClipboard) Init() error { return nil }
 
 func (f *fakeClipboard) WriteText(s string) error {
+
 	p := os.Getenv("PEA_FAKE_CLIP_FILE")
+
 	if p == "" {
+
 		// default to temp file in current working directory
 		tmp := os.TempDir()
 		p = filepath.Join(tmp, "pea_fake_clipboard")
 	}
+
 	// Ensure directory exists
 	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 		return err
 	}
+
 	return os.WriteFile(p, []byte(s), 0o644)
 }
 

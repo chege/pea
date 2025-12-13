@@ -18,26 +18,36 @@ func newRootCmd() *cobra.Command {
 		Long:  "p is a fast, local CLI to store short text under names and retrieve it instantly.",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			if len(args) == 1 {
+
 				store, err := ensureStore()
+
 				if err != nil {
 					return err
 				}
+
 				b, err := readEntry(store, args[0])
+
 				if err != nil {
 					return err
 				}
+
 				// Write to stdout
 				_, err = cmd.OutOrStdout().Write(b)
+
 				if err != nil {
 					return err
 				}
+
 				// If stdout is a TTY, copy to clipboard
 				if isTTY() {
 					_ = copyToClipboard(string(b))
 				}
+
 				return nil
 			}
+
 			return cmd.Help()
 		},
 	}
@@ -58,6 +68,7 @@ func newRootCmd() *cobra.Command {
 
 func main() {
 	root := newRootCmd()
+
 	if err := root.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
