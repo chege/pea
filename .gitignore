@@ -13,3 +13,7 @@ COPILOT_INSTRUCTIONS.md
 # Project docs not tracked in git
 SRS.md
 WORK_PROMPT.md
+
+# Build artifacts
+bin/
+pea

@@ -1,6 +1,10 @@
 package main
 
-import "github.com/spf13/cobra"
+import (
+	"strings"
+
+	"github.com/spf13/cobra"
+)
 
 func completeNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	store, err := ensureStore()
@@ -13,19 +17,9 @@ func completeNames(cmd *cobra.Command, args []string, toComplete string) ([]stri
 	}
 	var out []string
 	for _, n := range names {
-		if toComplete == "" || hasPrefix(n, toComplete) {
+		if strings.HasPrefix(n, toComplete) || toComplete == "" {
 			out = append(out, n)
 		}
 	}
 	return out, cobra.ShellCompDirectiveNoFileComp
-}
-
-func hasPrefix(s, prefix string) bool {
-	if len(prefix) == 0 {
-		return true
-	}
-	if len(prefix) > len(s) {
-		return false
-	}
-	return s[:len(prefix)] == prefix
 }
