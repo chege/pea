@@ -25,6 +25,11 @@ func TestTomlStoreDir(t *testing.T) {
 
 	cfg := filepath.Join(base, "config.toml")
 
+	t.Cleanup(func() {
+		_ = os.Remove(cfg)
+		_ = os.RemoveAll(store)
+	})
+
 	if err := os.WriteFile(cfg, []byte("store_dir = \""+store+"\"\n"), 0o644); err != nil {
 
 		t.Fatal(err)
