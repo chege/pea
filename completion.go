@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func completeNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func completeNames(_ *cobra.Command, _ []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	store, err := ensureStore()
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError

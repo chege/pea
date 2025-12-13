@@ -16,7 +16,7 @@ func addListCommand(root *cobra.Command) {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "list stored entries",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			store, err := ensureStore()
 			if err != nil {
 				return err
@@ -81,22 +81,6 @@ func ensureStore() (string, error) {
 	return store, nil
 }
 
-func parseStoreDir(s string) string {
-	for _, line := range strings.Split(s, "\n") {
-		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "store_dir") {
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				v := strings.TrimSpace(parts[1])
-				v = strings.Trim(v, "\"'")
-				if v != "" {
-					return v
-				}
-			}
-		}
-	}
-	return ""
-}
 
 func listEntries(store string) ([]string, error) {
 	files, err := os.ReadDir(store)

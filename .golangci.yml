@@ -1,0 +1,15 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - errcheck
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - revive
+    - unused
+    - unparam
+issues:
+  exclude-rules:
+    - linters: [unparam]
+      text: "_" # allow intentionally unused params via underscore
