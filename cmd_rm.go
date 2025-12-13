@@ -27,8 +27,8 @@ func addRemoveCommand(root *cobra.Command) {
 			}
 			// git rm + commit
 			_ = exec.Command("bash", "-c", "cd '"+store+"' && git rm -f '"+name+".txt' && git commit -m 'rm "+name+"'").Run()
-			fmt.Fprintln(cmd.OutOrStdout(), name)
-			return nil
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), name)
+			return err
 		},
 	}
 	root.AddCommand(cmd)

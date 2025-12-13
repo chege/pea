@@ -2,19 +2,12 @@ package e2e
 
 import (
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 )
 
 func TestListEntries(t *testing.T) {
-	root := filepath.Join("..")
-	bin := filepath.Join(root, "bin", "pea")
-	build := exec.Command("go", "build", "-o", bin, ".")
-	build.Dir = root
-	if out, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build failed: %v\n%s", err, out)
-	}
+	bin := buildBinary(t)
 	// Create entries
 	add1 := exec.Command(bin, "add", "b_entry")
 	add1.Stdin = strings.NewReader("b\n")

@@ -26,7 +26,9 @@ func addListCommand(root *cobra.Command) {
 				return err
 			}
 			for _, e := range entries {
-				fmt.Fprintln(cmd.OutOrStdout(), e)
+				if _, err := fmt.Fprintln(cmd.OutOrStdout(), e); err != nil {
+					return err
+				}
 			}
 			return nil
 		},
@@ -80,7 +82,6 @@ func ensureStore() (string, error) {
 	}
 	return store, nil
 }
-
 
 func listEntries(store string) ([]string, error) {
 	files, err := os.ReadDir(store)

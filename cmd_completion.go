@@ -35,7 +35,7 @@ func addCompletionCommand(root *cobra.Command) {
 					if err != nil {
 						return err
 					}
-					defer f.Close()
+					defer func() { _ = f.Close() }()
 					if err := root.GenBashCompletion(f); err != nil {
 						return err
 					}
@@ -45,13 +45,13 @@ func addCompletionCommand(root *cobra.Command) {
 					if err != nil {
 						return err
 					}
-					defer f.Close()
+					defer func() { _ = f.Close() }()
 					if err := root.GenZshCompletion(f); err != nil {
 						return err
 					}
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "installed completion: bash=%s zsh=%s\n", bashPath, zshPath)
-				return nil
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "installed completion: bash=%s zsh=%s\n", bashPath, zshPath)
+				return err
 			default:
 				return cmd.Help()
 			}

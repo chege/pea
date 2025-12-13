@@ -2,20 +2,13 @@ package e2e
 
 import (
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 )
 
 // This test verifies that when output is piped (non-TTY), clipboard is not modified.
 func TestClipboardNotModifiedWhenPiped(t *testing.T) {
-	root := filepath.Join("..")
-	bin := filepath.Join(root, "bin", "pea")
-	build := exec.Command("go", "build", "-o", bin, ".")
-	build.Dir = root
-	if out, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build failed: %v\n%s", err, out)
-	}
+	bin := buildBinary(t)
 	// Add entry
 	add := exec.Command(bin, "add", "cliptest")
 	add.Stdin = strings.NewReader("clipboard data\n")

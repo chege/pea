@@ -31,6 +31,11 @@ tasks:
     cmds:
       - go vet ./...
 
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
   tidy:
     desc: Tidy module dependencies
     cmds:
@@ -47,8 +52,16 @@ tasks:
       - go test -v ./e2e
 
   check:
-    desc: Run fmt, vet, and test
+    desc: Run fmt, vet, lint, and test
     cmds:
       - task fmt
       - task vet
+      - task lint
       - task test
+
+  ci:
+    desc: Run CI-equivalent checks (build, lint, test)
+    cmds:
+      - go build ./...
+      - golangci-lint run ./...
+      - go test ./...

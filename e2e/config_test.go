@@ -9,13 +9,7 @@ import (
 )
 
 func TestEnvOverridesStore(t *testing.T) {
-	root := filepath.Join("..")
-	bin := filepath.Join(root, "bin", "pea")
-	build := exec.Command("go", "build", "-o", bin, ".")
-	build.Dir = root
-	if out, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build failed: %v\n%s", err, out)
-	}
+	bin := buildBinary(t)
 	tmp := t.TempDir()
 	cmd := exec.Command(bin, "add", "envcase")
 	cmd.Env = append(os.Environ(), "PEA_STORE="+tmp)

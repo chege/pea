@@ -9,14 +9,7 @@ import (
 )
 
 func TestRetrieveByName(t *testing.T) {
-	root := filepath.Join("..")
-	bin := filepath.Join(root, "bin", "pea")
-	// Build binary
-	build := exec.Command("go", "build", "-o", bin, ".")
-	build.Dir = root
-	if out, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build failed: %v\n%s", err, out)
-	}
+	bin := buildBinary(t)
 	// Add entry via stdin
 	cmd := exec.Command(bin, "add", "greet")
 	cmd.Stdin = strings.NewReader("Hello\n")

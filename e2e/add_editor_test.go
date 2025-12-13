@@ -8,13 +8,7 @@ import (
 )
 
 func TestAddOpensEditorWhenNoStdin(t *testing.T) {
-	root := filepath.Join("..")
-	bin := filepath.Join(root, "bin", "pea")
-	build := exec.Command("go", "build", "-o", bin, ".")
-	build.Dir = root
-	if out, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build failed: %v\n%s", err, out)
-	}
+	bin := buildBinary(t)
 	// Create a temp editor script that writes to the file
 	tmp := t.TempDir()
 	ed := filepath.Join(tmp, "editor.sh")

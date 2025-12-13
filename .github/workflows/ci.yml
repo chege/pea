@@ -19,6 +19,9 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Install clipboard build deps (X11)
+        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbcommon-dev
+
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:

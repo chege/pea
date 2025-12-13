@@ -34,8 +34,8 @@ func addMoveCommand(root *cobra.Command) {
 			}
 			// git add new and commit
 			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+".txt' && git commit -m 'mv "+oldName+" -> "+newName+"'").Run()
-			fmt.Fprintln(cmd.OutOrStdout(), newName)
-			return nil
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), newName)
+			return err
 		},
 	}
 	root.AddCommand(cmd)

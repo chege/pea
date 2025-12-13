@@ -1,3 +1,4 @@
+// Package main implements the p CLI.
 package main
 
 import (
@@ -32,7 +33,7 @@ func addAddCommand(root *cobra.Command) {
 				if err != nil {
 					return err
 				}
-				defer f.Close()
+				defer func() { _ = f.Close() }()
 				src = f
 			} else {
 				// If stdin has data, read it; else open $EDITOR for the target path
@@ -57,12 +58,17 @@ func addAddCommand(root *cobra.Command) {
 							if err := c.Run(); err != nil {
 								return fmt.Errorf("$EDITOR is not set and launching BROWSER failed: %w", err)
 							}
-						} else {
-							if err := browser.OpenFile(path); err != nil {
-								return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
+							if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
+								return err
 							}
+							return nil
 						}
-						fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+						if err := browser.OpenFile(path); err != nil {
+							return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
+						}
+						if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
+							return err
+						}
 						return nil
 					}
 					// Launch editor; content handled by editor, then print name and exit
@@ -73,7 +79,9 @@ func addAddCommand(root *cobra.Command) {
 					if err := c.Run(); err != nil {
 						return err
 					}
-					fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+					if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
+						return err
+					}
 					return nil
 				}
 			}
@@ -86,7 +94,9 @@ func addAddCommand(root *cobra.Command) {
 			}
 			// git add + commit
 			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+name+".txt' && git commit -m 'add "+name+"'").Run()
-			fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
