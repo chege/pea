@@ -53,6 +53,11 @@ func buildBinary(t *testing.T) string {
 
 		script := "#!/bin/bash\nexport PEA_HEADLESS=1\nexport PEA_FAKE_CLIP_FILE='" + fakeClip + "'\nexec '" + bin + "' \"$@\"\n"
 
+		// Also set the environment in the test process so tests can use the same
+		// fake clipboard path without falling back to OS clipboard utilities.
+		_ = os.Setenv("PEA_HEADLESS", "1")
+		_ = os.Setenv("PEA_FAKE_CLIP_FILE", fakeClip)
+
 		if err := os.WriteFile(wrapper, []byte(script), 0o755); err != nil {
 
 			t.Fatalf("write wrapper failed: %v", err)
