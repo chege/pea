@@ -26,8 +26,8 @@ Status: Draft — decisions incorporated
   - Outputs: content (and optionally metadata).
   - Errors: not found, ambiguous match.
 - FR-3 List Prompts
-  - Behavior: list names and basic metadata (description, tags); may indicate versions count.
-  - Outputs: human-readable list.
+  - Behavior: list prompt names (without `.txt`) in lexicographic order; output is names only in v0 (no metadata or counts).
+  - Outputs: human-readable list of names, one per line.
   - Errors: IO failures.
 - FR-4 Delete Prompt
   - Behavior: Git-backed delete (remove and commit); default policy uses Git delete semantics.
