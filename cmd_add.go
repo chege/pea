@@ -27,12 +27,15 @@ func addAddCommand(root *cobra.Command) {
 			}
 			name := toSnake(args[0])
 			path := filepath.Join(store, name+".txt")
+
 			var src io.Reader
+
 			if len(args) > 1 {
 				f, err := os.Open(args[1])
 				if err != nil {
 					return err
 				}
+
 				defer func() { _ = f.Close() }()
 				src = f
 			} else {
@@ -40,7 +43,9 @@ func addAddCommand(root *cobra.Command) {
 				if isInputFromPipe() {
 					src = bufio.NewReader(os.Stdin)
 				} else {
+
 					ed := os.Getenv("EDITOR")
+
 					// Ensure file exists before opening editor
 					if _, err := os.Stat(path); os.IsNotExist(err) {
 						if err := os.WriteFile(path, []byte{}, 0o644); err != nil {
@@ -49,6 +54,7 @@ func addAddCommand(root *cobra.Command) {
 					} else if err != nil {
 						return err
 					}
+
 					if ed == "" {
 						if b := os.Getenv("BROWSER"); b != "" {
 							c := exec.Command("bash", "-c", b+" \""+path+"\"")
@@ -63,6 +69,7 @@ func addAddCommand(root *cobra.Command) {
 							}
 							return nil
 						}
+
 						if err := platform.BrowserImpl.OpenFile(path); err != nil {
 							return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
 						}
@@ -71,6 +78,7 @@ func addAddCommand(root *cobra.Command) {
 						}
 						return nil
 					}
+
 					// Launch editor; content handled by editor, then print name and exit
 					c := exec.Command("bash", "-c", ed+" \""+path+"\"")
 					c.Stdin = os.Stdin

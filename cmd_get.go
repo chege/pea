@@ -30,6 +30,7 @@ func stripFrontMatter(b []byte) []byte {
 			}
 		}
 	}
+
 	return b
 }
 
@@ -38,6 +39,7 @@ func isTTY() bool {
 	if err != nil {
 		return false
 	}
+
 	return (fi.Mode() & os.ModeCharDevice) != 0
 }
 
@@ -46,5 +48,6 @@ func copyToClipboard(s string) error {
 	if err := platform.ClipboardImpl.Init(); err != nil {
 		return err
 	}
+
 	return platform.ClipboardImpl.WriteText(s)
 }
