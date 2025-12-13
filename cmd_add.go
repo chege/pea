@@ -1,4 +1,4 @@
-// Package main implements the p CLI.
+// Package main implements the pea CLI.
 package main
 
 import (
@@ -22,16 +22,20 @@ func addAddCommand(root *cobra.Command) {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := ensureStore()
+
 			if err != nil {
 				return err
 			}
+
 			name := toSnake(args[0])
+
 			path := filepath.Join(store, name+".txt")
 
 			var src io.Reader
 
 			if len(args) > 1 {
 				f, err := os.Open(args[1])
+
 				if err != nil {
 					return err
 				}
@@ -73,9 +77,11 @@ func addAddCommand(root *cobra.Command) {
 						if err := platform.BrowserImpl.OpenFile(path); err != nil {
 							return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
 						}
+
 						if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
 							return err
 						}
+
 						return nil
 					}
 
@@ -87,24 +93,32 @@ func addAddCommand(root *cobra.Command) {
 					if err := c.Run(); err != nil {
 						return err
 					}
+
 					if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
 						return err
 					}
+
 					return nil
 				}
 			}
+
 			data, err := io.ReadAll(src)
+
 			if err != nil {
 				return err
 			}
+
 			if err := os.WriteFile(path, data, 0o644); err != nil {
 				return err
 			}
+
 			// git add + commit
 			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+name+".txt' && git commit -m 'add "+name+"'").Run()
+
 			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
 				return err
 			}
+
 			return nil
 		},
 	}

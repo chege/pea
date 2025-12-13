@@ -1,90 +1,39 @@
-# Product Requirements Document (PRD)
+Project: pea — Fast Prompt Storage & Retrieval CLI
 
-Project: p (pea) — Fast Prompt Storage & Retrieval CLI
-Last updated: 2025-12-12T21:25:53.894Z
+Summary
 
-1. Purpose
+pea is a small, fast CLI to store short Markdown-like text under simple names and retrieve it instantly. It focuses on minimal UX, shell completion, and plain files that work well with Git.
 
-- p is a fast, local CLI for storing short Markdown-like text under simple names and retrieving it instantly to stdout
-  or the system clipboard. Optimized for daily repetitive use: speed, minimal keystrokes, completion, predictability.
+Goals
 
-2. Problem
+- Minimal interface for speedy storage & retrieval
+- Portable plain-file storage that works with Git
+- Fast retrieval for copy/paste usage
 
-- Developers frequently reuse structured text (prompts, notes, instructions, snippets). Existing tools are slow,
-  UI-heavy, SaaS-bound, or lack fast CLI retrieval and completion.
+User stories
 
-3. Goals
+- Store by name (editor): `pea add notes` → opens editor → saved as notes.txt
+- Store by importing a file: `pea add notes existing.txt` → copies file contents
+- Retrieve for paste: `pea notes` → prints and copies to clipboard if stdout is a TTY
+- Scripted usage: `pea notes > out.txt` → prints only; clipboard untouched
+- Discover entries: `pea ls`
+- Fast completion: `pea <TAB>`, `pea add <TAB>`
 
-- Primary: instant reuse, minimal typing, first-class shell completion, fast enough to feel invisible.
-- Secondary: scriptable/pipe-friendly, plain files (Git-friendly), no daemons, trivial install via go install.
+Commands
 
-4. Non-Goals
+- `pea add <name>` opens $EDITOR <store>/<name>.txt; creates if missing
+- `pea add <name> <file>` imports file; writes to <store>/<name>.txt
+- `echo "text" | pea add <name>` reads stdin
+- `pea <name>` reads <store>/<name>.txt (select latest version by default: HEAD in Git history)
+- `pea ls` lists entry names (without .txt), one per line, sorted lexicographically
+- `pea completion zsh|bash` outputs completion script; `pea completion install` installs into common locations
+- `pea rm <name>` performs Git-backed delete (remove and commit); default policy: Git delete
+- `pea mv <old> <new>` uses Git-backed rename; normal Git semantics apply
 
-- Not an LLM client or prompt executor; no cloud sync; no search in v0; no fuzzy picker/UI; no templates/variables in
-  v0.
+Install
 
-5. Target Users
+- `go install github.com/<user>/pea@latest`
 
-- Software engineers and terminal power users who frequently use chat-based AI tools.
+Notes
 
-6. Core Use Cases
-
-- UC1 Store by name (editor): `p add notes` → opens editor → saved as notes.txt
-- UC2 Store by importing a file: `p add notes existing.txt` → copies file contents
-- UC3 Retrieve for paste: `p notes` → prints and copies to clipboard if stdout is a TTY
-- UC4 Scripted usage: `p notes > out.txt` → prints only; clipboard untouched
-- UC5 Discover entries: `p ls`
-- UC6 Fast completion: `p <TAB>`, `p add <TAB>`
-
-7. Functional Requirements
-
-- FR1 Storage
-    - Entries are plain-text files: snake_case .txt (lowercase; strip invalid chars)
-    - One entry per file; metadata stored inline as YAML front matter
-    - Default directory: ~/.pea/prompts
-    - Config file: ~/.pea/config.toml (may override defaults)
-    - On first run, auto-create ~/.pea/prompts and config file if missing
-- FR2 Add Entry
-    - `p add <name>` opens $EDITOR <store>/<name>.txt; creates if missing
-    - `p add <name> <file>` imports file; writes to <store>/<name>.txt
-    - `echo "text" | p add <name>` reads stdin
-    - Versioning is managed via Git commits; changes are recorded and latest (HEAD) is the default selection
-- FR3 Retrieve Entry
-    - `p <name>` reads <store>/<name>.txt (select latest version by default: HEAD in Git history)
-    - Writes content to stdout
-    - If stdout is a TTY, copy full output to clipboard; if redirected/piped, do not copy
-- FR4 List Entries
-    - `p ls` lists entry names (without .txt), one per line, sorted lexicographically
-- FR5 Auto-Completion
-    - `p completion zsh|bash` outputs completion script; `p completion install` installs into common locations
-    - Completion based on <store>/*.txt (names without extension)
-- FR6 Delete Entry
-    - `p rm <name>` performs Git-backed delete (remove and commit); default policy: Git delete
-- FR7 Rename Entry
-    - `p mv <old> <new>` uses Git-backed rename; normal Git semantics apply
-
-8. Non-Functional Requirements
-
-- Performance: Go single binary; instant startup; lightweight config parsing via ~/.pea/config.toml; no background
-  processes.
-- UX: minimal flags; stable, predictable commands; completion-first discovery; prefer $EDITOR and fall back to opening the file with the OS default handler via `github.com/pkg/browser` when $EDITOR is unset.
-- Portability: macOS (v0); clipboard via library abstraction (golang-design/clipboard).
-
-9. Error Handling
-
-- Errors to stderr; non-zero exit on failure; clear, actionable messages; no partial output on error.
-
-10. Installation
-
-- `go install github.com/<user>/p@latest`
-- Binary installs to $(go env GOPATH)/bin
-
-11. Success Criteria
-
-- Store and retrieve in <2 seconds; used multiple times per day; users rely on completion; repository contains simple,
-  readable files; `--help` is sufficient for usage.
-
-12. Summary
-
-- p is a Unix-style primitive for text reuse: store text under a name, retrieve it instantly, with speed, simplicity,
-  predictability, and excellent shell integration.
+- pea is a Unix-style primitive for text reuse: store text under a name, retrieve it instantly, with speed, simplicity, and predictable semantics.

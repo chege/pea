@@ -28,8 +28,8 @@ func addCompletionCommand(root *cobra.Command) {
 				}
 				base := filepath.Join(home, ".pea")
 				_ = os.MkdirAll(base, 0o755)
-				bashPath := filepath.Join(base, "p.bash")
-				zshPath := filepath.Join(base, "_p")
+				bashPath := filepath.Join(base, "pea.bash")
+				zshPath := filepath.Join(base, "_pea")
 				{
 					f, err := os.Create(bashPath)
 					if err != nil {
