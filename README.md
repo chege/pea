@@ -42,7 +42,7 @@ p rm hello
 - `p add <name> [file]` — add entry by name
   - stdin: `echo text | p add notes`
   - import file: `p add notes readme.txt`
-  - editor: if no stdin/file, opens `$EDITOR` (set it, e.g., `export EDITOR=vim`); if unset, falls back to cross-platform default via `open-golang` (uses OS default handler)
+  - editor: if no stdin/file, opens `$EDITOR` (set it, e.g., `export EDITOR=vim`); if unset, the command errors (no fallback)
 - `p ls` — list entry names (sorted)
 - `p rm <name>` — delete entry (Git commit best-effort)
 - `p mv <old> <new>` — rename entry (Git commit best-effort)
