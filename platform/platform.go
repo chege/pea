@@ -1,3 +1,7 @@
+// Package platform provides adapters and fakes for OS-dependent features
+// such as clipboard and browser interactions used by the application. The
+// real adapters delegate to OS libraries while the fakes enable headless
+// CI and tests.
 package platform
 
 import (
@@ -87,6 +91,4 @@ func (f *fakeClipboard) WriteText(s string) error {
 // fakeBrowser does a no-op for headless tests.
 type fakeBrowser struct{}
 
-func (f *fakeBrowser) OpenFile(path string) error {
-	return errors.New("fake browser cannot open files")
-}
+func (f *fakeBrowser) OpenFile(_ string) error { return nil }
