@@ -49,8 +49,18 @@ func addAddCommand(root *cobra.Command) {
 						return err
 					}
 					if ed == "" {
-						if err := browser.OpenFile(path); err != nil {
-							return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
+						if b := os.Getenv("BROWSER"); b != "" {
+							c := exec.Command("bash", "-c", b+" \""+path+"\"")
+							c.Stdin = os.Stdin
+							c.Stdout = cmd.OutOrStdout()
+							c.Stderr = cmd.ErrOrStderr()
+							if err := c.Run(); err != nil {
+								return fmt.Errorf("$EDITOR is not set and launching BROWSER failed: %w", err)
+							}
+						} else {
+							if err := browser.OpenFile(path); err != nil {
+								return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
+							}
 						}
 						fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
 						return nil
