@@ -14,6 +14,7 @@ func addRemoveCommand(root *cobra.Command) {
 		Use:   "rm <name>",
 		Short: "delete an entry",
 		Args:  cobra.ExactArgs(1),
+		ValidArgsFunction: completeNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := ensureStore()
 			if err != nil {

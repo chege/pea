@@ -3,6 +3,7 @@ package e2e
 import (
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -20,5 +21,8 @@ func TestCompletionBash(t *testing.T) {
 	}
 	if len(out) == 0 {
 		t.Fatalf("empty completion output")
+	}
+	if !strings.Contains(string(out), "__start_p") {
+		t.Fatalf("completion script missing expected function")
 	}
 }

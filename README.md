@@ -46,8 +46,7 @@ p rm hello
 - `p ls` — list entry names (sorted)
 - `p rm <name>` — delete entry (Git commit best-effort)
 - `p mv <old> <new>` — rename entry (Git commit best-effort)
-- `p completion [bash|zsh]` — output completion script
-- `p completion install` — write scripts to `~/.pea/p.bash` and `~/.pea/_p`
+- `p completion [bash|zsh]` — output completion script (redirect to your shell’s completion directory)
 
 Run `p --help` or `p <command> --help` for usage.
 
