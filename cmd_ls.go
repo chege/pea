@@ -63,7 +63,9 @@ func ensureStore() (string, error) {
 		_ = os.WriteFile(cfg, []byte("# pea config\n# store_dir = \""+store+"\"\n"), 0o644)
 	}
 	// Read config.toml for store_dir using TOML parser if available
-	var conf struct{ StoreDir string `toml:"store_dir"` }
+	var conf struct {
+		StoreDir string `toml:"store_dir"`
+	}
 	if _, err := toml.DecodeFile(cfg, &conf); err == nil {
 		if conf.StoreDir != "" {
 			store = conf.StoreDir
