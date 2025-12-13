@@ -5,7 +5,6 @@
 package platform
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"sync"
