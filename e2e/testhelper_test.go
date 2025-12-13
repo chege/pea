@@ -31,7 +31,16 @@ func buildBinary(t *testing.T) string {
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("build failed: %v\n%s", err, out)
 		}
-		binPath = bin
+		// Create a small wrapper that enables headless/fake platform implementations
+		// for tests (PEA_HEADLESS) and points the fake clipboard file to a location
+		// under the same tmp dir so tests can inspect it.
+		wrapper := filepath.Join(tmpDir, "pea-wrapper")
+		fakeClip := filepath.Join(tmpDir, "pea_fake_clipboard")
+		script := "#!/bin/bash\nexport PEA_HEADLESS=1\nexport PEA_FAKE_CLIP_FILE='" + fakeClip + "'\nexec '" + bin + "' \"$@\"\n"
+		if err := os.WriteFile(wrapper, []byte(script), 0o755); err != nil {
+			t.Fatalf("write wrapper failed: %v", err)
+		}
+		binPath = wrapper
 	})
 	return binPath
 }

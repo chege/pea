@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
+	"pea/platform"
 )
 
 func addAddCommand(root *cobra.Command) {
@@ -63,7 +63,7 @@ func addAddCommand(root *cobra.Command) {
 							}
 							return nil
 						}
-						if err := browser.OpenFile(path); err != nil {
+						if err := platform.BrowserImpl.OpenFile(path); err != nil {
 							return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
 						}
 						if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {

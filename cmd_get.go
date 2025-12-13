@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	clipboard "golang.design/x/clipboard"
+	"pea/platform"
 )
 
 func readEntry(store, name string) ([]byte, error) {
@@ -42,10 +42,9 @@ func isTTY() bool {
 }
 
 func copyToClipboard(s string) error {
-	// Cross-platform clipboard via golang.design/x/clipboard
-	if err := clipboard.Init(); err != nil {
+	// Use platform clipboard abstraction
+	if err := platform.ClipboardImpl.Init(); err != nil {
 		return err
 	}
-	clipboard.Write(clipboard.FmtText, []byte(s))
-	return nil
+	return platform.ClipboardImpl.WriteText(s)
 }

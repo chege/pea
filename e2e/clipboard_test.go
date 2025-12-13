@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -15,20 +16,36 @@ func TestClipboardNotModifiedWhenPiped(t *testing.T) {
 	if out, err := add.CombinedOutput(); err != nil {
 		t.Fatalf("add failed: %v\n%s", err, out)
 	}
-	// Set baseline clipboard
-	if out, err := exec.Command("bash", "-c", "printf baseline | pbcopy").CombinedOutput(); err != nil {
-		t.Fatalf("pbcopy baseline failed: %v\n%s", err, out)
+	// Set baseline clipboard (use fake file when running headless)
+	if fake := os.Getenv("PEA_FAKE_CLIP_FILE"); fake != "" {
+		if err := os.WriteFile(fake, []byte("baseline"), 0o644); err != nil {
+			t.Fatalf("write fake baseline failed: %v", err)
+		}
+	} else {
+		if out, err := exec.Command("bash", "-c", "printf baseline | pbcopy").CombinedOutput(); err != nil {
+			t.Fatalf("pbcopy baseline failed: %v\n%s", err, out)
+		}
 	}
 	// Pipe output to non-TTY and ensure clipboard unchanged
 	sh := exec.Command("bash", "-c", bin+" cliptest | cat > /dev/null")
 	if out, err := sh.CombinedOutput(); err != nil {
 		t.Fatalf("retrieve piped failed: %v\n%s", err, out)
 	}
-	clip, err := exec.Command("bash", "-c", "pbpaste").CombinedOutput()
-	if err != nil {
-		t.Fatalf("pbpaste failed: %v", err)
-	}
-	if string(clip) != "baseline" {
-		t.Fatalf("clipboard should remain baseline, got: %q", string(clip))
+	if fake := os.Getenv("PEA_FAKE_CLIP_FILE"); fake != "" {
+		clip, err := os.ReadFile(fake)
+		if err != nil {
+			t.Fatalf("read fake clipboard failed: %v", err)
+		}
+		if string(clip) != "baseline" {
+			t.Fatalf("clipboard should remain baseline, got: %q", string(clip))
+		}
+	} else {
+		clip, err := exec.Command("bash", "-c", "pbpaste").CombinedOutput()
+		if err != nil {
+			t.Fatalf("pbpaste failed: %v", err)
+		}
+		if string(clip) != "baseline" {
+			t.Fatalf("clipboard should remain baseline, got: %q", string(clip))
+		}
 	}
 }
