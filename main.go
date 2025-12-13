@@ -13,9 +13,9 @@ var (
 
 func newRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "p [name]",
-		Short: "p: fast local prompt storage & retrieval",
-		Long:  "p is a fast, local CLI to store short text under names and retrieve it instantly.",
+		Use:   "pea [name]",
+		Short: "pea: fast local prompt storage & retrieval",
+		Long:  "pea is a fast, local CLI to store short text under names and retrieve it instantly.",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
@@ -56,7 +56,7 @@ func newRootCmd() *cobra.Command {
 	cmd.SilenceErrors = false
 
 	cmd.Version = version
-	cmd.SetVersionTemplate("p version {{.Version}}\n")
+	cmd.SetVersionTemplate("pea version {{.Version}}\n")
 
 	addListCommand(cmd)
 	addAddCommand(cmd)

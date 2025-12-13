@@ -1,16 +1,16 @@
-# p (pea) — Fast Prompt Storage & Retrieval CLI
+# 🫛 pea — Fast Prompt Storage & Retrieval CLI
 
-p is a fast, local CLI to store short Markdown-like text under simple names and retrieve it instantly to stdout (and to the clipboard when in a TTY). It favors speed, minimal keystrokes, shell completion, and plain files that work well with Git.
+pea is a fast, local CLI to store short Markdown-like text under simple names and retrieve it instantly to stdout (and to the clipboard when in a TTY). It favors speed, minimal keystrokes, shell completion, and plain files that work well with Git.
 
 Status: v0.1.0 (macOS focus). Core commands implemented: add, retrieve, ls, rm, mv, completion; env/config; TTY-only clipboard; simple YAML front matter support; basic Git-backed versioning.
 
 ## Features
 - Plain files: one entry per file, snake_case .txt (lowercase; invalid chars stripped)
-- Instant retrieval: `p <name>` prints content; when stdout is a TTY, content is copied to clipboard
+- Instant retrieval: `pea <name>` prints content; when stdout is a TTY, content is copied to clipboard
 - Add content three ways: stdin, import a file, or open $EDITOR
-- Discover: `p ls` lists names (sorted)
-- Manage: `p rm <name>` and `p mv <old> <new>`
-- Shell completion: `p completion bash|zsh` and `p completion install`
+- Discover: `pea ls` lists names (sorted)
+- Manage: `pea rm <name>` and `pea mv <old> <new>`
+- Shell completion: `pea completion bash|zsh` and `pea completion install`
 - Configurable storage dir via env or TOML config
 - Git-backed changes: store is a Git repo; add/rm/mv create commits (best-effort)
 - Front matter: YAML front matter delimited by `---` is stripped on retrieval
@@ -24,31 +24,31 @@ Status: v0.1.0 (macOS focus). Core commands implemented: add, retrieve, ls, rm, 
 ## Quick start
 ```
 # Add via stdin
-echo "Hello world" | p add hello_world
+echo "Hello world" | pea add hello_world
 
 # Retrieve (prints and copies to clipboard when TTY)
-p hello_world
+pea hello_world
 
 # List entries
-p ls
+pea ls
 
 # Rename and delete
-p mv hello_world hello
-p rm hello
+pea mv hello_world hello
+pea rm hello
 ```
 
 ## Commands
-- `p [name]` — retrieve entry content (stdout; copies to clipboard in TTY)
-- `p add <name> [file]` — add entry by name
-  - stdin: `echo text | p add notes`
-  - import file: `p add notes readme.txt`
+- `pea [name]` — retrieve entry content (stdout; copies to clipboard in TTY)
+- `pea add <name> [file]` — add entry by name
+  - stdin: `echo text | pea add notes`
+  - import file: `pea add notes readme.txt`
   - editor: if no stdin/file, opens `$EDITOR` (set it, e.g., `export EDITOR=vim`); if unset, falls back to the OS default handler via `github.com/pkg/browser`
-- `p ls` — list entry names (sorted)
-- `p rm <name>` — delete entry (Git commit best-effort)
-- `p mv <old> <new>` — rename entry (Git commit best-effort)
-- `p completion [bash|zsh]` — output completion script (redirect to your shell’s completion directory)
+- `pea ls` — list entry names (sorted)
+- `pea rm <name>` — delete entry (Git commit best-effort)
+- `pea mv <old> <new>` — rename entry (Git commit best-effort)
+- `pea completion [bash|zsh]` — output completion script (redirect to your shell’s completion directory)
 
-Run `p --help` or `p <command> --help` for usage.
+Run `pea --help` or `pea <command> --help` for usage.
 
 ## Storage layout
 - Default store: `~/.pea/prompts`
@@ -74,14 +74,14 @@ Run `p --help` or `p <command> --help` for usage.
   - On first run, `~/.pea/config.toml` is created if missing
 
 ## Clipboard behavior (macOS v0)
-- If stdout is a TTY, `p <name>` copies the printed content to the system clipboard (uses `pbcopy`)
+- If stdout is a TTY, `pea <name>` copies the printed content to the system clipboard (uses `pbcopy`)
 - If output is redirected or piped, clipboard is not touched
 
 ## Shell completion
 - Generate scripts:
-  - Bash: `p completion bash > ~/.pea/p.bash`
-  - Zsh: `p completion zsh > ~/.pea/_p`
-- Automatic install to `~/.pea/`: `p completion install`
+  - Bash: `pea completion bash > ~/.pea/pea.bash`
+  - Zsh: `pea completion zsh > ~/.pea/_pea`
+- Automatic install to `~/.pea/`: `pea completion install`
 - Add to your shell profile to source these files as desired
 
 ## Git-backed versioning
