@@ -67,7 +67,7 @@ Last updated: 2025-12-12T21:25:53.894Z
 
 - Performance: Go single binary; instant startup; lightweight config parsing via ~/.pea/config.toml; no background
   processes.
-- UX: minimal flags; stable, predictable commands; completion-first discovery; use $EDITOR only (error if unset).
+- UX: minimal flags; stable, predictable commands; completion-first discovery; prefer $EDITOR and fall back to opening the file with the OS default handler via `github.com/pkg/browser` when $EDITOR is unset.
 - Portability: macOS (v0); clipboard via library abstraction (golang-design/clipboard).
 
 9. Error Handling

@@ -1,6 +1,6 @@
 # pea CLI — Software Requirements Specification (SRS)
 
-Last updated: 2025-12-12T21:25:53.894Z
+Last updated: 2025-12-13T07:35:00.694Z
 Status: Draft — decisions incorporated
 
 1. Introduction
@@ -18,7 +18,7 @@ Status: Draft — decisions incorporated
 3. Functional Requirements
 - FR-1 Add Prompt
   - Inputs: name; content via stdin, file path, or $EDITOR (flags to select); optional metadata description (string), tags (list).
-  - Behavior: create file in ~/.pea/prompts; filename snake_case with .txt (lowercase; strip invalid chars); metadata stored inline as YAML front matter; versioning managed via Git commits.
+  - Behavior: create file in ~/.pea/prompts; filename snake_case with .txt (lowercase; strip invalid chars); metadata stored inline as YAML front matter; versioning managed via Git commits; if $EDITOR is unset and no stdin/file is provided, open the target file with the system default handler via `github.com/pkg/browser` (error if launch fails).
   - Outputs: confirmation with location; changes recorded in Git.
   - Errors: validation, conflicts, IO failures.
 - FR-2 Retrieve Prompt

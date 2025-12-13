@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 )
 
@@ -39,14 +40,20 @@ func addAddCommand(root *cobra.Command) {
 					src = bufio.NewReader(os.Stdin)
 				} else {
 					ed := os.Getenv("EDITOR")
-					if ed == "" {
-						return fmt.Errorf("$EDITOR is not set; set EDITOR or pipe stdin")
-					}
 					// Ensure file exists before opening editor
 					if _, err := os.Stat(path); os.IsNotExist(err) {
 						if err := os.WriteFile(path, []byte{}, 0o644); err != nil {
 							return err
 						}
+					} else if err != nil {
+						return err
+					}
+					if ed == "" {
+						if err := browser.OpenFile(path); err != nil {
+							return fmt.Errorf("$EDITOR is not set and opening default editor failed: %w", err)
+						}
+						fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+						return nil
 					}
 					// Launch editor; content handled by editor, then print name and exit
 					c := exec.Command("bash", "-c", ed+" \""+path+"\"")
