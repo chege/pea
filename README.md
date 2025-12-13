@@ -42,7 +42,7 @@ p rm hello
 - `p add <name> [file]` — add entry by name
   - stdin: `echo text | p add notes`
   - import file: `p add notes readme.txt`
-  - editor: if no stdin/file, opens `$EDITOR` targeting the new file (set it, e.g., `export EDITOR=vim`); on macOS, if `$EDITOR` is unset, falls back to `open -W` (default handler)
+  - editor: if no stdin/file, opens `$EDITOR` (set it, e.g., `export EDITOR=vim`); if unset: on macOS falls back to `open -W`, on Linux to `xdg-open`
 - `p ls` — list entry names (sorted)
 - `p rm <name>` — delete entry (Git commit best-effort)
 - `p mv <old> <new>` — rename entry (Git commit best-effort)
