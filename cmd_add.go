@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -107,10 +108,19 @@ func addAddCommand(root *cobra.Command) {
 				}
 			}
 
+			existedBefore := fileExists(path)
+
 			data, err := io.ReadAll(src)
 
 			if err != nil {
 				return err
+			}
+
+			if len(bytes.TrimSpace(data)) == 0 {
+				if !existedBefore {
+					_ = os.Remove(path)
+				}
+				return fmt.Errorf("add failed: empty content")
 			}
 
 			if err := os.WriteFile(path, data, 0o644); err != nil {

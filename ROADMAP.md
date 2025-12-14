@@ -1,6 +1,6 @@
 # pea Roadmap
 
-Status: v0.1.0 (macOS-focused, local-only). Updated: 2025-12-14T16:48:37Z.
+Status: v0.1.0 (macOS-focused, local-only). Updated: 2025-12-14T18:34:44.296Z.
 
 ## Now (hardening v0.1.x)
 
