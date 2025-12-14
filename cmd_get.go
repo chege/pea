@@ -4,28 +4,50 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"pea/platform"
 )
 
-func readEntry(store, name string) ([]byte, error) {
+func readEntry(store, name, rev string) ([]byte, error) {
 	name, err := normalizeName(name)
 	if err != nil {
 		return nil, err
 	}
-	path, _, err := existingEntryPath(store, name)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
+
+	if rev == "" {
+		path, _, err := existingEntryPath(store, name)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				return nil, fmt.Errorf("not found: %s", name)
+			}
+			return nil, err
+		}
+		b, err := os.ReadFile(path)
+		if err != nil {
 			return nil, fmt.Errorf("not found: %s", name)
 		}
+		return stripFrontMatter(b), nil
+	}
+
+	if b, err := showAtRef(store, rev, name+defaultExt); err == nil {
+		return stripFrontMatter(b), nil
+	}
+	if b, err := showAtRef(store, rev, name+legacyExt); err == nil {
+		return stripFrontMatter(b), nil
+	}
+	return nil, fmt.Errorf("not found in ref %s: %s", rev, name)
+}
+
+func showAtRef(store, rev, path string) ([]byte, error) {
+	c := exec.Command("git", "show", fmt.Sprintf("%s:%s", rev, path))
+	c.Dir = store
+	out, err := c.CombinedOutput()
+	if err != nil {
 		return nil, err
 	}
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("not found: %s", name)
-	}
-	return stripFrontMatter(b), nil
+	return out, nil
 }
 
 // stripFrontMatter removes simple YAML front matter delimited by lines starting with '---'.

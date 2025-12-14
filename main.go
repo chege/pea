@@ -13,6 +13,7 @@ var (
 )
 
 func newRootCmd() *cobra.Command {
+	var rev string
 	base, defaultStore := defaultPaths()
 	cfgPath := filepath.Join(base, "config.toml")
 	cmd := &cobra.Command{
@@ -30,7 +31,7 @@ func newRootCmd() *cobra.Command {
 					return err
 				}
 
-				b, err := readEntry(store, args[0])
+				b, err := readEntry(store, args[0], rev)
 
 				if err != nil {
 					return err
@@ -67,6 +68,7 @@ func newRootCmd() *cobra.Command {
 	addMoveCommand(cmd)
 	addHistoryCommand(cmd)
 	addCompletionCommand(cmd)
+	cmd.Flags().StringVar(&rev, "rev", "", "read entry content from a specific git ref")
 	return cmd
 }
 
