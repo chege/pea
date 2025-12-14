@@ -12,8 +12,8 @@ Goals
 
 User stories
 
-- Store by name (editor): `pea add notes` → opens editor → saved as notes.txt
-- Store by importing a file: `pea add notes existing.txt` → copies file contents
+- Store by name (editor): `pea add notes` → opens editor → saved as notes.md
+- Store by importing a file: `pea add notes existing.md` → copies file contents
 - Retrieve for paste: `pea notes` → prints and copies to clipboard if stdout is a TTY
 - Scripted usage: `pea notes > out.txt` → prints only; clipboard untouched
 - Discover entries: `pea ls`
@@ -21,11 +21,11 @@ User stories
 
 Commands
 
-- `pea add <name>` opens $EDITOR <store>/<name>.txt; creates if missing
-- `pea add <name> <file>` imports file; writes to <store>/<name>.txt
+- `pea add <name>` opens $EDITOR <store>/<name>.md; creates if missing (legacy `.txt` still readable)
+- `pea add <name> <file>` imports file; writes to <store>/<name>.md by default
 - `echo "text" | pea add <name>` reads stdin
-- `pea <name>` reads <store>/<name>.txt (select latest version by default: HEAD in Git history)
-- `pea ls` lists entry names (without .txt), one per line, sorted lexicographically
+- `pea <name>` reads <store>/<name>.md (select latest version by default: HEAD in Git history; legacy `.txt` also supported)
+- `pea ls` lists entry names (without extension), one per line, sorted lexicographically
 - `pea completion zsh|bash` outputs completion script; `pea completion install` installs into common locations
 - `pea rm <name>` performs Git-backed delete (remove and commit); default policy: Git delete
 - `pea mv <old> <new>` uses Git-backed rename; normal Git semantics apply

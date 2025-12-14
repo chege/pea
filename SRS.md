@@ -18,7 +18,7 @@ Status: Draft — decisions incorporated
 3. Functional Requirements
 - FR-1 Add Prompt
   - Inputs: name; content via stdin, file path, or $EDITOR (flags to select); optional metadata description (string), tags (list).
-  - Behavior: create file in ~/.pea/prompts; filename snake_case with .txt (lowercase; strip invalid chars); metadata stored inline as YAML front matter; versioning managed via Git commits; if $EDITOR is unset and no stdin/file is provided, open the target file with the system default handler via `github.com/pkg/browser` (error if launch fails).
+  - Behavior: create file in ~/.pea/prompts; filename snake_case with .md (lowercase; strip invalid chars); metadata stored inline as YAML front matter; versioning managed via Git commits; if $EDITOR is unset and no stdin/file is provided, open the target file with the system default handler via `github.com/pkg/browser` (error if launch fails); legacy `.txt` entries remain readable.
   - Outputs: confirmation with location; changes recorded in Git.
   - Errors: validation, conflicts, IO failures.
 - FR-2 Retrieve Prompt
@@ -26,7 +26,7 @@ Status: Draft — decisions incorporated
   - Outputs: content (and optionally metadata).
   - Errors: not found, ambiguous match.
 - FR-3 List Prompts
-  - Behavior: list prompt names (without `.txt`) in lexicographic order; output is names only in v0 (no metadata or counts).
+  - Behavior: list prompt names (without extension) in lexicographic order; output is names only in v0 (no metadata or counts).
   - Outputs: human-readable list of names, one per line.
   - Errors: IO failures.
 - FR-4 Delete Prompt
@@ -62,7 +62,7 @@ Status: Draft — decisions incorporated
 - STDIN/STDOUT/STDERR: standard IO for scripting.
 
 6. Data Model
-- Prompt: plain-text .txt file; one per prompt.
+- Prompt: plain-text .md file (legacy `.txt` supported); one per prompt.
 - Naming: snake_case from prompt name.
 - Metadata: description (string), tags (list); representation decided during design (inline header or sidecar index).
 - Versioning: multiple versions per prompt; default operations act on latest; scheme defined in design.

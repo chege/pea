@@ -33,7 +33,7 @@ func TestRenameEntry(t *testing.T) {
 	// Verify new file content
 	home, _ := os.UserHomeDir()
 
-	path := filepath.Join(home, ".pea", "prompts", "beta.txt")
+	path := filepath.Join(home, ".pea", "prompts", "beta.md")
 
 	b, err := os.ReadFile(path)
 

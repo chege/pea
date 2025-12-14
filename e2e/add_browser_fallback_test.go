@@ -41,7 +41,7 @@ func TestAddFallsBackToBrowserWhenEditorUnset(t *testing.T) {
 		t.Fatalf("add via browser fallback failed: %v\n%s", err, out)
 	}
 
-	entry := filepath.Join(store, "fallback_entry.txt")
+	entry := filepath.Join(store, "fallback_entry.md")
 
 	data, err := os.ReadFile(entry)
 

@@ -17,7 +17,7 @@ func TestRetrieveStripsFrontMatter(t *testing.T) {
 
 	_ = os.MkdirAll(store, 0o755)
 
-	path := filepath.Join(store, "fm_test.txt")
+	path := filepath.Join(store, "fm_test.md")
 
 	content := "---\ndescription: test\n---\nBody line 1\nBody line 2\n"
 

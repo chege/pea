@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -27,13 +26,19 @@ func addMoveCommand(root *cobra.Command) {
 			}
 			oldName := toSnake(args[0])
 			newName := toSnake(args[1])
-			oldPath := filepath.Join(store, oldName+".txt")
-			newPath := filepath.Join(store, newName+".txt")
+			oldPath, ext, err := existingEntryPath(store, oldName)
+			if err != nil {
+				return fmt.Errorf("rename failed: %w", err)
+			}
+			newPath := defaultEntryPath(store, newName)
+			if ext == legacyExt {
+				newPath = legacyEntryPath(store, newName)
+			}
 			if err := os.Rename(oldPath, newPath); err != nil {
 				return fmt.Errorf("rename failed: %w", err)
 			}
 			// git add new and commit
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+".txt' && git commit -m 'mv "+oldName+" -> "+newName+"'").Run()
+			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+ext+"' && git commit -m 'mv "+oldName+" -> "+newName+"'").Run()
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), newName)
 			return err
 		},

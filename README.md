@@ -5,7 +5,7 @@ pea is a fast, local CLI to store short Markdown-like text under simple names an
 Status: v0.1.0 (macOS focus). Core commands implemented: add, retrieve, ls, rm, mv, completion; env/config; TTY-only clipboard; simple YAML front matter support; basic Git-backed versioning.
 
 ## ✨ Features
-- Plain files: one entry per file, snake_case .txt (lowercase; invalid chars stripped)
+- Plain files: one entry per file, snake_case .md (lowercase; invalid chars stripped)
 - Instant retrieval: `pea <name>` prints content; when stdout is a TTY, content is copied to clipboard
 - Add content three ways: stdin, import a file, or open $EDITOR
 - Discover: `pea ls` lists names (sorted)
@@ -41,7 +41,7 @@ pea rm hello
 - `pea [name]` — retrieve entry content (stdout; copies to clipboard in TTY)
 - `pea add <name> [file]` — add entry by name
   - stdin: `echo text | pea add notes`
-  - import file: `pea add notes readme.txt`
+  - import file: `pea add notes readme.md`
   - editor: if no stdin/file, opens `$EDITOR` (set it, e.g., `export EDITOR=vim`); if unset, falls back to the OS default handler via `github.com/pkg/browser`
 - `pea ls` — list entry names (sorted)
 - `pea rm <name>` — delete entry (Git commit best-effort)
@@ -52,7 +52,7 @@ Run `pea --help` or `pea <command> --help` for usage.
 
 ## 📁 Storage layout
 - Default store: `~/.pea/prompts`
-- Files: `<name>.txt` (snake_case)
+- Files: `<name>.md` (snake_case; legacy `.txt` still readable)
 - Content may include an optional YAML front matter block at the top:
   ```
   ---

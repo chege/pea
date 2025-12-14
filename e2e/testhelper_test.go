@@ -50,11 +50,14 @@ func buildBinary(t *testing.T) string {
 		wrapper := filepath.Join(tmpDir, "pea-wrapper")
 
 		fakeClip := filepath.Join(tmpDir, "pea_fake_clipboard")
+		home := filepath.Join(tmpDir, "home")
+		_ = os.MkdirAll(home, 0o755)
 
-		script := "#!/bin/bash\nexport PEA_HEADLESS=1\nexport PEA_FAKE_CLIP_FILE='" + fakeClip + "'\nexec '" + bin + "' \"$@\"\n"
+		script := "#!/bin/bash\nexport HOME='" + home + "'\nexport PEA_HEADLESS=1\nexport PEA_FAKE_CLIP_FILE='" + fakeClip + "'\nexec '" + bin + "' \"$@\"\n"
 
 		// Also set the environment in the test process so tests can use the same
 		// fake clipboard path without falling back to OS clipboard utilities.
+		_ = os.Setenv("HOME", home)
 		_ = os.Setenv("PEA_HEADLESS", "1")
 		_ = os.Setenv("PEA_FAKE_CLIP_FILE", fakeClip)
 

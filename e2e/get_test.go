@@ -38,7 +38,7 @@ func TestRetrieveByName(t *testing.T) {
 	// Ensure file exists
 	home, _ := os.UserHomeDir()
 
-	path := filepath.Join(home, ".pea", "prompts", "greet.txt")
+	path := filepath.Join(home, ".pea", "prompts", "greet.md")
 
 	if _, err := os.Stat(path); err != nil {
 

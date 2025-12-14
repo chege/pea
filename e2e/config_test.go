@@ -25,7 +25,7 @@ func TestEnvOverridesStore(t *testing.T) {
 		t.Fatalf("add failed: %v\n%s", err, out)
 	}
 
-	if _, err := os.Stat(filepath.Join(tmp, "envcase.txt")); err != nil {
+	if _, err := os.Stat(filepath.Join(tmp, "envcase.md")); err != nil {
 
 		t.Fatalf("file not in env store: %v", err)
 	}

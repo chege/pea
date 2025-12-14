@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -21,12 +20,18 @@ func addRemoveCommand(root *cobra.Command) {
 				return err
 			}
 			name := toSnake(args[0])
-			path := filepath.Join(store, name+".txt")
+			path, ext, err := existingEntryPath(store, name)
+			if err != nil {
+				if os.IsNotExist(err) {
+					return fmt.Errorf("delete failed: %w", err)
+				}
+				return err
+			}
 			if err := os.Remove(path); err != nil {
 				return fmt.Errorf("delete failed: %w", err)
 			}
 			// git rm + commit
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git rm -f '"+name+".txt' && git commit -m 'rm "+name+"'").Run()
+			_ = exec.Command("bash", "-c", "cd '"+store+"' && git rm -f '"+name+ext+"' && git commit -m 'rm "+name+"'").Run()
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), name)
 			return err
 		},

@@ -36,7 +36,7 @@ func TestAddOpensEditorWhenNoStdin(t *testing.T) {
 
 	home, _ := os.UserHomeDir()
 
-	store := filepath.Join(home, ".pea", "prompts", "edited_entry.txt")
+	store := filepath.Join(home, ".pea", "prompts", "edited_entry.md")
 
 	b, err := os.ReadFile(store)
 

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"pea/platform"
@@ -11,7 +11,13 @@ import (
 
 func readEntry(store, name string) ([]byte, error) {
 	name = toSnake(name)
-	path := filepath.Join(store, name+".txt")
+	path, _, err := existingEntryPath(store, name)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, fmt.Errorf("not found: %s", name)
+		}
+		return nil, err
+	}
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("not found: %s", name)

@@ -25,7 +25,7 @@ func TestAddViaStdin(t *testing.T) {
 
 	store, _ := os.UserHomeDir()
 
-	store = filepath.Join(store, ".pea", "prompts", "hello_world.txt")
+	store = filepath.Join(store, ".pea", "prompts", "hello_world.md")
 
 	data, err := os.ReadFile(store)
 

@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -29,7 +28,10 @@ func addAddCommand(root *cobra.Command) {
 
 			name := toSnake(args[0])
 
-			path := filepath.Join(store, name+".txt")
+			path, ext, err := targetEntryPath(store, name)
+			if err != nil {
+				return err
+			}
 
 			var src io.Reader
 
@@ -113,7 +115,7 @@ func addAddCommand(root *cobra.Command) {
 			}
 
 			// git add + commit
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+name+".txt' && git commit -m 'add "+name+"'").Run()
+			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+name+ext+"' && git commit -m 'add "+name+"'").Run()
 
 			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
 				return err

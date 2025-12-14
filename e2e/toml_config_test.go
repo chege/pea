@@ -45,7 +45,7 @@ func TestTomlStoreDir(t *testing.T) {
 		t.Fatalf("add failed: %v\n%s", err, out)
 	}
 
-	if _, err := os.Stat(filepath.Join(store, "toml_entry.txt")); err != nil {
+	if _, err := os.Stat(filepath.Join(store, "toml_entry.md")); err != nil {
 
 		t.Fatalf("entry not in toml store: %v", err)
 	}
