@@ -38,7 +38,8 @@ func addMoveCommand(root *cobra.Command) {
 				return fmt.Errorf("rename failed: %w", err)
 			}
 			// git add new and commit
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+ext+"' && git commit -m 'mv "+oldName+" -> "+newName+"'").Run()
+			commitMsg := fmt.Sprintf("refactor: rename %s%s to %s%s", oldName, ext, newName, ext)
+			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+ext+"' && git commit -m '"+commitMsg+"'").Run()
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), newName)
 			return err
 		},
