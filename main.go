@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -12,10 +13,12 @@ var (
 )
 
 func newRootCmd() *cobra.Command {
+	base, defaultStore := defaultPaths()
+	cfgPath := filepath.Join(base, "config.toml")
 	cmd := &cobra.Command{
 		Use:   "pea [name]",
 		Short: "pea: fast local prompt storage & retrieval",
-		Long:  "pea is a fast, local CLI to store short text under names and retrieve it instantly.",
+		Long:  fmt.Sprintf("pea is a fast, local CLI to store short text under names and retrieve it instantly.\n\nDefaults: store at %s; config at %s; env override: PEA_STORE (highest precedence).", defaultStore, cfgPath),
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 

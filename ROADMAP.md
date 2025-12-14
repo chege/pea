@@ -9,8 +9,6 @@ Status: v0.1.0 (macOS-focused, local-only). Updated: 2025-12-14T16:48:37Z.
   - Deterministic auto-commit subjects for add/mv/rm (including chore vs refactor rename paths) and consistent add/rm semantics.
   - Surface Git errors to stderr without failing the primary command; clear guidance when Git is absent/misconfigured.
   - E2E coverage for add/mv/rm auto-commit flows and failure cases.
-- Config robustness: validation with helpful errors, env/config precedence tests, and defaults documented in help
-  output.
 - UX polish: clearer errors for missing entries, invalid names, and editor launch failures; improve completion install
   paths.
 
