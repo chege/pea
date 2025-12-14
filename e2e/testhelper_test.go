@@ -53,7 +53,7 @@ func buildBinary(t *testing.T) string {
 		home := filepath.Join(tmpDir, "home")
 		_ = os.MkdirAll(home, 0o755)
 
-		script := "#!/bin/bash\nexport HOME='" + home + "'\nexport PEA_HEADLESS=1\nexport PEA_FAKE_CLIP_FILE='" + fakeClip + "'\nexec '" + bin + "' \"$@\"\n"
+		script := "#!/bin/bash\nif [ -z \"$HOME\" ]; then export HOME='" + home + "'; fi\nexport PEA_HEADLESS=1\nexport PEA_FAKE_CLIP_FILE='" + fakeClip + "'\nexec '" + bin + "' \"$@\"\n"
 
 		// Also set the environment in the test process so tests can use the same
 		// fake clipboard path without falling back to OS clipboard utilities.

@@ -25,10 +25,19 @@ func addMoveCommand(root *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			oldName := toSnake(args[0])
-			newName := toSnake(args[1])
+			oldName, err := normalizeName(args[0])
+			if err != nil {
+				return err
+			}
+			newName, err := normalizeName(args[1])
+			if err != nil {
+				return err
+			}
 			oldPath, ext, err := existingEntryPath(store, oldName)
 			if err != nil {
+				if os.IsNotExist(err) {
+					return fmt.Errorf("rename failed: not found: %s", oldName)
+				}
 				return fmt.Errorf("rename failed: %w", err)
 			}
 			newPath := defaultEntryPath(store, newName)

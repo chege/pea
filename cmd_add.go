@@ -26,7 +26,10 @@ func addAddCommand(root *cobra.Command) {
 				return err
 			}
 
-			name := toSnake(args[0])
+			name, err := normalizeName(args[0])
+			if err != nil {
+				return err
+			}
 
 			path, ext, err := targetEntryPath(store, name)
 			if err != nil {

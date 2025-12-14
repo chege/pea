@@ -18,11 +18,14 @@ func addRemoveCommand(root *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			name := toSnake(args[0])
+			name, err := normalizeName(args[0])
+			if err != nil {
+				return err
+			}
 			path, ext, err := existingEntryPath(store, name)
 			if err != nil {
 				if os.IsNotExist(err) {
-					return fmt.Errorf("delete failed: %w", err)
+					return fmt.Errorf("delete failed: not found: %s", name)
 				}
 				return err
 			}

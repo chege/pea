@@ -10,7 +10,10 @@ import (
 )
 
 func readEntry(store, name string) ([]byte, error) {
-	name = toSnake(name)
+	name, err := normalizeName(name)
+	if err != nil {
+		return nil, err
+	}
 	path, _, err := existingEntryPath(store, name)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
