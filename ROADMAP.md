@@ -12,7 +12,6 @@ Status: v0.1.0 (macOS-focused, local-only). Updated: 2025-12-14T16:48:37Z.
 - Search and filtering: name/substring and tag-based queries over entries.
 - Version awareness: allow retrieving a specific revision.
 - Packaging/portability: publish binaries or install scripts for macOS/Linux; lighter dependency footprint.
-- Safety: optional confirmation/undo for destructive commands; dry-run flags where applicable.
 
 ## Later (exploratory)
 

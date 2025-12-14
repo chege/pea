@@ -1,14 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 func addMoveCommand(root *cobra.Command) {
 	var choreRename bool
+	var confirm bool
+	var dryRun bool
 
 	cmd := &cobra.Command{
 		Use:   "mv <old> <new>",
@@ -44,6 +48,19 @@ func addMoveCommand(root *cobra.Command) {
 			if ext == legacyExt {
 				newPath = legacyEntryPath(store, newName)
 			}
+			if dryRun {
+				_, err := fmt.Fprintf(cmd.OutOrStdout(), "dry-run: would rename %s%s to %s%s\n", oldName, ext, newName, ext)
+				return err
+			}
+			if confirm {
+				fmt.Fprintf(cmd.OutOrStdout(), "Rename %s%s to %s%s? [y/N]: ", oldName, ext, newName, ext)
+				reader := bufio.NewReader(cmd.InOrStdin())
+				ans, _ := reader.ReadString('\n')
+				ans = strings.ToLower(strings.TrimSpace(ans))
+				if ans != "y" && ans != "yes" {
+					return fmt.Errorf("rename aborted")
+				}
+			}
 			if err := os.Rename(oldPath, newPath); err != nil {
 				return fmt.Errorf("rename failed: %w", err)
 			}
@@ -58,5 +75,7 @@ func addMoveCommand(root *cobra.Command) {
 		},
 	}
 	cmd.Flags().BoolVar(&choreRename, "chore", false, "mark rename as organizational")
+	cmd.Flags().BoolVar(&confirm, "confirm", false, "prompt before renaming")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "show what would happen without renaming")
 	root.AddCommand(cmd)
 }

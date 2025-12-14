@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 )
 
 // gitAddAndCommit attempts to stage the provided paths and commit with commitMsg.
@@ -48,4 +49,27 @@ func gitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Wr
 	if out, err := commit.CombinedOutput(); err != nil {
 		fmt.Fprintf(stderr, "warning: git commit failed: %v: %s\n", err, string(out))
 	}
+}
+
+func revertLastCommitForPath(store, path string, stderr io.Writer) error {
+	if stderr == nil {
+		stderr = io.Discard
+	}
+
+	logCmd := exec.Command("git", "log", "-n1", "--format=%H", "--", path)
+	logCmd.Dir = store
+	shaOut, err := logCmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("git log failed: %w: %s", err, string(shaOut))
+	}
+	sha := strings.TrimSpace(string(shaOut))
+	if sha == "" {
+		return fmt.Errorf("no commits found for %s", path)
+	}
+	revert := exec.Command("git", "revert", "--no-edit", sha)
+	revert.Dir = store
+	if out, err := revert.CombinedOutput(); err != nil {
+		return fmt.Errorf("git revert failed: %w: %s", err, string(out))
+	}
+	return nil
 }
