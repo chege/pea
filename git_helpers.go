@@ -27,6 +27,7 @@ func gitAddAndCommit(store string, paths []string, commitMsg string, stderr io.W
 	if out, err := commit.CombinedOutput(); err != nil {
 		fmt.Fprintf(stderr, "warning: git commit failed: %v: %s\n", err, string(out))
 	}
+	pushIfRemote(store, stderr)
 }
 
 // gitRmAndCommit attempts to stage deletions and commit with commitMsg.
@@ -49,6 +50,7 @@ func gitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Wr
 	if out, err := commit.CombinedOutput(); err != nil {
 		fmt.Fprintf(stderr, "warning: git commit failed: %v: %s\n", err, string(out))
 	}
+	pushIfRemote(store, stderr)
 }
 
 func revertLastCommitForPath(store, path string, stderr io.Writer) error {
@@ -72,4 +74,21 @@ func revertLastCommitForPath(store, path string, stderr io.Writer) error {
 		return fmt.Errorf("git revert failed: %w: %s", err, string(out))
 	}
 	return nil
+}
+
+func pushIfRemote(store string, stderr io.Writer) {
+	if stderr == nil {
+		stderr = io.Discard
+	}
+	remoteCmd := exec.Command("git", "config", "--get", "remote.origin.url")
+	remoteCmd.Dir = store
+	out, err := remoteCmd.CombinedOutput()
+	if err != nil || strings.TrimSpace(string(out)) == "" {
+		return
+	}
+	push := exec.Command("git", "push", "-u", "origin", "HEAD")
+	push.Dir = store
+	if out, err := push.CombinedOutput(); err != nil {
+		fmt.Fprintf(stderr, "warning: git push failed: %v: %s\n", err, string(out))
+	}
 }
