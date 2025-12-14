@@ -114,9 +114,9 @@ func addAddCommand(root *cobra.Command) {
 				return err
 			}
 
-			// git add + commit
+			// git add + commit (best-effort)
 			commitMsg := "feat: add " + name + ext
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+name+ext+"' && git commit -m '"+commitMsg+"'").Run()
+			gitAddAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
 
 			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
 				return err

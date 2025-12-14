@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -30,8 +29,9 @@ func addRemoveCommand(root *cobra.Command) {
 			if err := os.Remove(path); err != nil {
 				return fmt.Errorf("delete failed: %w", err)
 			}
-			// git rm + commit
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git rm -f '"+name+ext+"' && git commit -m 'rm "+name+"'").Run()
+			// git rm + commit (best-effort)
+			commitMsg := "chore: remove " + name + ext
+			gitRmAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), name)
 			return err
 		},

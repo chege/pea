@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
 )
 
 func addMoveCommand(root *cobra.Command) {
+	var choreRename bool
+
 	cmd := &cobra.Command{
 		Use:   "mv <old> <new>",
 		Short: "rename an entry",
@@ -37,12 +38,16 @@ func addMoveCommand(root *cobra.Command) {
 			if err := os.Rename(oldPath, newPath); err != nil {
 				return fmt.Errorf("rename failed: %w", err)
 			}
-			// git add new and commit
+			// git add new and commit (best-effort)
 			commitMsg := fmt.Sprintf("refactor: rename %s%s to %s%s", oldName, ext, newName, ext)
-			_ = exec.Command("bash", "-c", "cd '"+store+"' && git add '"+newName+ext+"' && git commit -m '"+commitMsg+"'").Run()
+			if choreRename {
+				commitMsg = fmt.Sprintf("chore: rename %s%s to %s%s", oldName, ext, newName, ext)
+			}
+			gitAddAndCommit(store, []string{oldName + ext, newName + ext}, commitMsg, cmd.ErrOrStderr())
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), newName)
 			return err
 		},
 	}
+	cmd.Flags().BoolVar(&choreRename, "chore", false, "mark rename as organizational")
 	root.AddCommand(cmd)
 }
