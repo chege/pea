@@ -87,3 +87,11 @@ Status: Draft — decisions incorporated
 
 13. Future Enhancements (non-goals now)
 - Tags-based search and filtering; remote sync/backends; templating/rendering; richer query/filter language.
+
+14. Roadmap-aligned design notes (planned)
+- Cross-platform clipboard: abstract ClipboardImpl for Linux/Windows; detect platform and use xclip/wl-copy equivalents with graceful fallback and TTY-aware guard rails.
+- Metadata commands: add/edit/view description/tags persisted as YAML front matter; retrieval strips front matter; list supports optional metadata columns.
+- Search and filtering: name substring and tag-based queries over stored entries; respect same store selection/precedence as other commands.
+- Version awareness: retrieving specific revisions via `--rev <ref>` using `git show`; history already covered; clear errors when ref/file missing.
+- Packaging/portability: publish install scripts/binaries for macOS/Linux; minimize dependencies; document required tools (git/clipboard).
+- Multi-store profiles: central config maps store names to absolute paths; selection precedence `--store` > `PEA_STORE` > default; each store self-contained with its own .git.

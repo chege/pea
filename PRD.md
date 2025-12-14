@@ -37,3 +37,11 @@ Install
 Notes
 
 - pea is a Unix-style primitive for text reuse: store text under a name, retrieve it instantly, with speed, simplicity, and predictable semantics.
+
+Planned (from roadmap)
+- Cross-platform clipboard: use platform-specific clipboard backends (Linux/Windows) with graceful fallback and TTY-aware behavior; keep macOS parity.
+- Metadata: commands to add/edit/view description and tags (YAML front matter); listing can optionally include metadata columns.
+- Search/filter: name substring and tag-based queries over stored entries; results respect current store selection.
+- Version awareness: allow retrieval at specific git refs via `--rev`; history is already available; produce clear errors for missing ref or file.
+- Packaging/portability: publish binaries or install scripts for macOS/Linux; keep dependency footprint small; document requirements (git, clipboard tools).
+- Multi-store profiles: central config maps store names to absolute paths; selection precedence `--store` > `PEA_STORE` > default; each store remains an isolated git repo.
