@@ -1,17 +1,18 @@
-package main
+package cmd
 
 import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"pea/internal/app"
 )
 
 func completeNames(_ *cobra.Command, _ []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	store, err := ensureStore()
+	store, err := app.EnsureStore()
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	names, err := listEntries(store)
+	names, err := app.ListEntries(store)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}

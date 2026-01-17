@@ -1,5 +1,4 @@
-// Package main implements the pea CLI.
-package main
+package cmd
 
 import (
 	"bufio"
@@ -8,11 +7,10 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"regexp"
-	"strings"
+	"pea/internal/app"
+	"pea/platform"
 
 	"github.com/spf13/cobra"
-	"pea/platform"
 )
 
 func addAddCommand(root *cobra.Command) {
@@ -21,18 +19,18 @@ func addAddCommand(root *cobra.Command) {
 		Short: "add a new entry by name, from editor, stdin, or a file",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			store, err := ensureStore()
+			store, err := app.EnsureStore()
 
 			if err != nil {
 				return err
 			}
 
-			name, err := normalizeName(args[0])
+			name, err := app.NormalizeName(args[0])
 			if err != nil {
 				return err
 			}
 
-			path, ext, err := targetEntryPath(store, name)
+			path, ext, err := app.TargetEntryPath(store, name)
 			if err != nil {
 				return err
 			}
@@ -108,7 +106,7 @@ func addAddCommand(root *cobra.Command) {
 				}
 			}
 
-			existedBefore := fileExists(path)
+			existedBefore := app.FileExists(path)
 
 			data, err := io.ReadAll(src)
 
@@ -129,7 +127,7 @@ func addAddCommand(root *cobra.Command) {
 
 			// git add + commit (best-effort)
 			commitMsg := "feat: add " + name + ext
-			gitAddAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
+			app.GitAddAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
 
 			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name); err != nil {
 				return err
@@ -139,15 +137,6 @@ func addAddCommand(root *cobra.Command) {
 		},
 	}
 	root.AddCommand(cmd)
-}
-
-var snakeRe = regexp.MustCompile(`[^a-z0-9_]+`)
-
-func toSnake(s string) string {
-	s = strings.ToLower(s)
-	s = strings.ReplaceAll(s, " ", "_")
-	s = snakeRe.ReplaceAllString(s, "")
-	return s
 }
 
 func isInputFromPipe() bool {

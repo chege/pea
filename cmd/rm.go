@@ -1,9 +1,10 @@
-package main
+package cmd
 
 import (
 	"bufio"
 	"fmt"
 	"os"
+	"pea/internal/app"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -21,36 +22,36 @@ func addRemoveCommand(root *cobra.Command) {
 		ValidArgsFunction: completeNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if undo {
-				store, err := ensureStore()
+				store, err := app.EnsureStore()
 				if err != nil {
 					return err
 				}
-				name, err := normalizeName(args[0])
+				name, err := app.NormalizeName(args[0])
 				if err != nil {
 					return err
 				}
-				_, ext, err := existingEntryPath(store, name)
+				_, ext, err := app.ExistingEntryPath(store, name)
 				if err != nil && !os.IsNotExist(err) {
 					return err
 				}
 				if ext == "" {
-					ext = defaultExt
+					ext = app.DefaultExt
 				}
-				if err := revertLastCommitForPath(store, name+ext, cmd.ErrOrStderr()); err != nil {
+				if err := app.RevertLastCommitForPath(store, name+ext, cmd.ErrOrStderr()); err != nil {
 					return fmt.Errorf("undo failed: %w", err)
 				}
 				_, err = fmt.Fprintln(cmd.OutOrStdout(), name)
 				return err
 			}
-			store, err := ensureStore()
+			store, err := app.EnsureStore()
 			if err != nil {
 				return err
 			}
-			name, err := normalizeName(args[0])
+			name, err := app.NormalizeName(args[0])
 			if err != nil {
 				return err
 			}
-			path, ext, err := existingEntryPath(store, name)
+			path, ext, err := app.ExistingEntryPath(store, name)
 			if err != nil {
 				if os.IsNotExist(err) {
 					return fmt.Errorf("delete failed: not found: %s", name)
@@ -75,7 +76,7 @@ func addRemoveCommand(root *cobra.Command) {
 			}
 			// git rm + commit (best-effort)
 			commitMsg := "chore: remove " + name + ext
-			gitRmAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
+			app.GitRmAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), name)
 			return err
 		},

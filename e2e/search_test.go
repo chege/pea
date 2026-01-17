@@ -46,45 +46,45 @@ How to cook pasta.`,
 	}
 
 	tests := []struct {
-		name     string
-		args     []string
-		want     []string
-		notWant  []string
+		name    string
+		args    []string
+		want    []string
+		notWant []string
 	}{
 		{
-			name: "search by substring",
-			args: []string{"search", "basics"},
-			want: []string{"golang_basics", "rust_basics"},
+			name:    "search by substring",
+			args:    []string{"search", "basics"},
+			want:    []string{"golang_basics", "rust_basics"},
 			notWant: []string{"cooking_pasta"},
 		},
 		{
-			name: "search by content",
-			args: []string{"search", "pasta"},
-			want: []string{"cooking_pasta"},
+			name:    "search by content",
+			args:    []string{"search", "pasta"},
+			want:    []string{"cooking_pasta"},
 			notWant: []string{"golang_basics", "rust_basics"},
 		},
 		{
-			name: "search by tag",
-			args: []string{"search", "--tag", "go"},
-			want: []string{"golang_basics"},
+			name:    "search by tag",
+			args:    []string{"search", "--tag", "go"},
+			want:    []string{"golang_basics"},
 			notWant: []string{"rust_basics", "cooking_pasta"},
 		},
 		{
-			name: "search by multiple tags",
-			args: []string{"search", "--tag", "coding", "--tag", "rust"},
-			want: []string{"rust_basics"},
+			name:    "search by multiple tags",
+			args:    []string{"search", "--tag", "coding", "--tag", "rust"},
+			want:    []string{"rust_basics"},
 			notWant: []string{"golang_basics", "cooking_pasta"},
 		},
 		{
-			name: "search by substring and tag",
-			args: []string{"search", "pasta", "--tag", "food"},
-			want: []string{"cooking_pasta"},
+			name:    "search by substring and tag",
+			args:    []string{"search", "pasta", "--tag", "food"},
+			want:    []string{"cooking_pasta"},
 			notWant: []string{"golang_basics", "rust_basics"},
 		},
 		{
-			name: "search no match",
-			args: []string{"search", "nonexistent"},
-			want: []string{}, // empty slice
+			name:    "search no match",
+			args:    []string{"search", "nonexistent"},
+			want:    []string{}, // empty slice
 			notWant: []string{"golang_basics", "rust_basics", "cooking_pasta"},
 		},
 	}

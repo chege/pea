@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-// gitAddAndCommit attempts to stage the provided paths and commit with commitMsg.
+// GitAddAndCommit attempts to stage the provided paths and commit with commitMsg.
 // It logs failures to stderr but does not block the calling command.
-func gitAddAndCommit(store string, paths []string, commitMsg string, stderr io.Writer) {
+func GitAddAndCommit(store string, paths []string, commitMsg string, stderr io.Writer) {
 	if stderr == nil {
 		stderr = io.Discard
 	}
@@ -27,12 +27,12 @@ func gitAddAndCommit(store string, paths []string, commitMsg string, stderr io.W
 	if out, err := commit.CombinedOutput(); err != nil {
 		fmt.Fprintf(stderr, "warning: git commit failed: %v: %s\n", err, string(out))
 	}
-	pushIfRemote(store, stderr)
+	PushIfRemote(store, stderr)
 }
 
-// gitRmAndCommit attempts to stage deletions and commit with commitMsg.
+// GitRmAndCommit attempts to stage deletions and commit with commitMsg.
 // It logs failures to stderr but does not block the calling command.
-func gitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Writer) {
+func GitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Writer) {
 	if stderr == nil {
 		stderr = io.Discard
 	}
@@ -50,10 +50,10 @@ func gitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Wr
 	if out, err := commit.CombinedOutput(); err != nil {
 		fmt.Fprintf(stderr, "warning: git commit failed: %v: %s\n", err, string(out))
 	}
-	pushIfRemote(store, stderr)
+	PushIfRemote(store, stderr)
 }
 
-func revertLastCommitForPath(store, path string, stderr io.Writer) error {
+func RevertLastCommitForPath(store, path string, stderr io.Writer) error {
 	if stderr == nil {
 		stderr = io.Discard
 	}
@@ -76,7 +76,7 @@ func revertLastCommitForPath(store, path string, stderr io.Writer) error {
 	return nil
 }
 
-func pushIfRemote(store string, stderr io.Writer) {
+func PushIfRemote(store string, stderr io.Writer) {
 	if stderr == nil {
 		stderr = io.Discard
 	}

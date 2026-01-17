@@ -1,9 +1,10 @@
-package main
+package cmd
 
 import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"pea/internal/app"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -18,17 +19,17 @@ func addHistoryCommand(root *cobra.Command) {
 		Short: "show git history for an entry",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			store, err := ensureStore()
+			store, err := app.EnsureStore()
 			if err != nil {
 				return err
 			}
 
-			name, err := normalizeName(args[0])
+			name, err := app.NormalizeName(args[0])
 			if err != nil {
 				return err
 			}
 
-			_, ext, err := existingEntryPath(store, name)
+			_, ext, err := app.ExistingEntryPath(store, name)
 			if err != nil {
 				return fmt.Errorf("history failed: not found: %s", name)
 			}

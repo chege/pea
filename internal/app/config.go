@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"errors"
@@ -10,9 +10,9 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-var configuredRemote string
+var ConfiguredRemote string
 
-func defaultPaths() (base string, store string) {
+func DefaultPaths() (base string, store string) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return filepath.Join("~", ".pea"), filepath.Join("~", ".pea", "prompts")
@@ -22,13 +22,13 @@ func defaultPaths() (base string, store string) {
 	return base, store
 }
 
-func ensureStore() (string, error) {
+func EnsureStore() (string, error) {
 	if v := os.Getenv("PEA_STORE"); v != "" {
-		configuredRemote = ""
+		ConfiguredRemote = ""
 		return prepareStore(v, "PEA_STORE", "")
 	}
 
-	base, defaultStore := defaultPaths()
+	base, defaultStore := DefaultPaths()
 
 	if err := os.MkdirAll(base, 0o755); err != nil {
 		return "", fmt.Errorf("failed to create base dir %s: %w", base, err)
@@ -46,7 +46,7 @@ func ensureStore() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	configuredRemote = remote
+	ConfiguredRemote = remote
 
 	return prepareStore(store, "config", remote)
 }

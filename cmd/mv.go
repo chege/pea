@@ -1,9 +1,10 @@
-package main
+package cmd
 
 import (
 	"bufio"
 	"fmt"
 	"os"
+	"pea/internal/app"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -25,28 +26,28 @@ func addMoveCommand(root *cobra.Command) {
 			return completeNames(cmd, args, toComplete)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			store, err := ensureStore()
+			store, err := app.EnsureStore()
 			if err != nil {
 				return err
 			}
-			oldName, err := normalizeName(args[0])
+			oldName, err := app.NormalizeName(args[0])
 			if err != nil {
 				return err
 			}
-			newName, err := normalizeName(args[1])
+			newName, err := app.NormalizeName(args[1])
 			if err != nil {
 				return err
 			}
-			oldPath, ext, err := existingEntryPath(store, oldName)
+			oldPath, ext, err := app.ExistingEntryPath(store, oldName)
 			if err != nil {
 				if os.IsNotExist(err) {
 					return fmt.Errorf("rename failed: not found: %s", oldName)
 				}
 				return fmt.Errorf("rename failed: %w", err)
 			}
-			newPath := defaultEntryPath(store, newName)
-			if ext == legacyExt {
-				newPath = legacyEntryPath(store, newName)
+			newPath := app.DefaultEntryPath(store, newName)
+			if ext == app.LegacyExt {
+				newPath = app.LegacyEntryPath(store, newName)
 			}
 			if dryRun {
 				_, err := fmt.Fprintf(cmd.OutOrStdout(), "dry-run: would rename %s%s to %s%s\n", oldName, ext, newName, ext)
@@ -69,7 +70,7 @@ func addMoveCommand(root *cobra.Command) {
 			if choreRename {
 				commitMsg = fmt.Sprintf("chore: rename %s%s to %s%s", oldName, ext, newName, ext)
 			}
-			gitAddAndCommit(store, []string{oldName + ext, newName + ext}, commitMsg, cmd.ErrOrStderr())
+			app.GitAddAndCommit(store, []string{oldName + ext, newName + ext}, commitMsg, cmd.ErrOrStderr())
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), newName)
 			return err
 		},

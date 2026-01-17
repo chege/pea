@@ -1,12 +1,14 @@
-package main
+package app
 
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 )
 
-// normalizeName converts input to snake_case and validates it is non-empty and not a reserved command.
-func normalizeName(raw string) (string, error) {
+// NormalizeName converts input to snake_case and validates it is non-empty and not a reserved command.
+func NormalizeName(raw string) (string, error) {
 	name := toSnake(raw)
 	if name == "" {
 		return "", fmt.Errorf("invalid name %q: use letters, numbers, or underscores", raw)
@@ -25,7 +27,16 @@ func isReserved(name string) bool {
 	return false
 }
 
-func fileExists(p string) bool {
+func FileExists(p string) bool {
 	info, err := os.Stat(p)
 	return err == nil && !info.IsDir()
+}
+
+var snakeRe = regexp.MustCompile(`[^a-z0-9_]+`)
+
+func toSnake(s string) string {
+	s = strings.ToLower(s)
+	s = strings.ReplaceAll(s, " ", "_")
+	s = snakeRe.ReplaceAllString(s, "")
+	return s
 }
