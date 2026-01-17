@@ -59,7 +59,7 @@ func addCompletionCommand(root *cobra.Command) {
 						return fmt.Errorf("generate zsh completion %s: %w", zshPath, err)
 					}
 				}
-				_, err = fmt.Fprintf(cmd.OutOrStdout(), "installed completion: bash=%s zsh=%s\n", bashPath, zshPath)
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "Completion scripts installed to %s\n\nTo enable, add the following to your shell config:\n\nBash (~/.bashrc):\n  source %s\n\nZsh (~/.zshrc):\n  fpath=(%s $fpath)\n  autoload -U compinit; compinit\n", base, bashPath, base)
 				return err
 			default:
 				return cmd.Help()
