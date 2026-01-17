@@ -1,116 +1,134 @@
-# 🫛 pea — Fast Prompt Storage & Retrieval CLI
+# 🫛 pea
 
-pea is a fast, local CLI to store short Markdown-like text under simple names and retrieve it instantly to stdout (and to the clipboard when in a TTY). It favors speed, minimal keystrokes, shell completion, and plain files that work well with Git.
+> **Fast, local prompt storage & retrieval.**
 
-Status: v0.1.0 (macOS focus). Core commands implemented: add, retrieve, ls, rm, mv, completion; env/config; TTY-only clipboard; simple YAML front matter support; basic Git-backed versioning.
+[![Go Version](https://img.shields.io/badge/go-1.25-blue.svg)](https://golang.org/dl/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+
+**pea** is a minimalist CLI designed to store short text snippets (prompts, notes, config fragments) under simple names and retrieve them instantly. It combines the speed of local files with the power of Git versioning and shell integration.
+
+---
 
 ## ✨ Features
-- Plain files: one entry per file, snake_case .md (lowercase; invalid chars stripped)
-- Instant retrieval: `pea <name>` prints content; when stdout is a TTY, content is copied to clipboard
-- Add content three ways: stdin, import a file, or open $EDITOR
-- Discover: `pea ls` lists names (sorted)
-- Manage: `pea rm <name>` and `pea mv <old> <new>`
-- Search: `pea search <query>` finds entries by name, content, or tags
-- Shell completion: `pea completion bash|zsh` and `pea completion install`
-- Configurable storage dir via env or TOML config
-- Git-backed changes: store is a Git repo; add/rm/mv create commits (best-effort)
-- Front matter: YAML front matter delimited by `---` is stripped on retrieval
 
-## ⚙️ Install
-- Go 1.25+
-- Build locally:
-  - `go build -o bin/pea .` or `just build`
-- Optional: `go install ./...` to place on PATH
+- **🚀 Instant Retrieval:** `pea <name>` prints content to stdout.
+- **📋 Smart Clipboard:** Auto-copies content to clipboard when running in a terminal (TTY).
+- **🔎 Powerful Search:** Find entries by name, content, or tags.
+- **📂 Plain Files:** Stores everything as simple `.md` files in `~/.pea/prompts`.
+- **🐚 Shell Completion:** First-class autocomplete for commands *and* your snippet names.
+- **🔄 Git-Backed:** Every change (add, edit, remove) is automatically committed to Git.
+- **🏷️ Metadata:** Supports YAML front matter (stripped on retrieval).
 
-## 🚀 Quick start
-```
-# Add via stdin
-echo "Hello world" | pea add hello_world
+## 🚀 Quick Start
 
-# Retrieve (prints and copies to clipboard when TTY)
-pea hello_world
+```bash
+# 1. Install (requires Go 1.25+)
+go install github.com/user/pea@latest
 
-# List entries
+# 2. Add your first snippet
+echo "Hello, world!" | pea add hello
+
+# 3. Retrieve it (copies to clipboard automatically!)
+pea hello
+
+# 4. List all snippets
 pea ls
-
-# Rename and delete
-pea mv hello_world hello
-pea rm hello
 ```
 
-## 🛠️ Commands
-- `pea [name]` — retrieve entry content (stdout; copies to clipboard in TTY)
-- `pea add <name> [file]` — add entry by name
-  - stdin: `echo text | pea add notes`
-  - import file: `pea add notes readme.md`
-  - editor: if no stdin/file, opens `$EDITOR` (set it, e.g., `export EDITOR=vim`); if unset, falls back to the OS default handler via `github.com/pkg/browser`
-- `pea ls` — list entry names (sorted)
-- `pea rm <name>` — delete entry (Git commit best-effort)
-- `pea mv <old> <new>` — rename entry (Git commit best-effort)
-- `pea search <query>` — search entries by name substring, content, or tags
-  - filter by tag: `pea search --tag coding`
-- `pea completion [bash|zsh]` — output completion script (redirect to your shell’s completion directory)
+## 🛠️ Usage
 
-Run `pea --help` or `pea <command> --help` for usage.
+### Core Commands
 
-## 📁 Storage layout
-- Default store: `~/.pea/prompts`
-- Files: `<name>.md` (snake_case; legacy `.txt` still readable)
-- Content may include an optional YAML front matter block at the top:
-  ```
-  ---
-  description: My snippet
-  tags: [ai, daily]
-  ---
-  Actual content starts here
-  ```
-- Retrieval strips the front matter and prints only the body
+| Command | Usage | Description |
+| :--- | :--- | :--- |
+| **Retrieve** | `pea <name>` | Print content (and copy to clipboard). |
+| **Add** | `pea add <name>` | Create/Edit via `$EDITOR` or stdin. |
+| **List** | `pea ls` | List all entry names. |
+| **Search** | `pea search <query>` | Search by name, content, or tags. |
+| **Remove** | `pea rm <name>` | Delete an entry (versioned). |
+| **Move** | `pea mv <old> <new>` | Rename an entry (versioned). |
+| **History** | `pea history <name>` | View Git history of an entry. |
+
+### Adding Content
+
+**From Stdin:**
+```bash
+echo "sk-12345-api-key" | pea add api_key
+```
+
+**From File:**
+```bash
+pea add project_docs ./README.md
+```
+
+**Using Editor:**
+```bash
+# Opens $EDITOR (vim, nano, code, etc.)
+pea add my_notes
+```
+
+### Search & Tags
+
+Entries can contain YAML front matter for organization:
+
+```yaml
+---
+tags: [work, email]
+---
+Here is my email template...
+```
+
+**Search:**
+```bash
+pea search template          # Search by name/content
+pea search --tag work        # Filter by tag
+```
 
 ## ⚙️ Configuration
-- Environment:
-  - `PEA_STORE` — absolute path to storage directory; overrides config file
-- Config file: `~/.pea/config.toml`
-  - Example:
-    ```toml
-    store_dir = "/absolute/path/to/store"
-    ```
-  - On first run, `~/.pea/config.toml` is created if missing
 
-## 📋 Clipboard behavior (macOS v0)
-- If stdout is a TTY, `pea <name>` copies the printed content to the system clipboard (uses `pbcopy`)
-- If output is redirected or piped, clipboard is not touched
+`pea` works out of the box with zero config. By default, it stores data in `~/.pea/prompts`.
 
-## 🔁 Shell completion
-- Generate scripts:
-  - Bash: `pea completion bash > ~/.pea/pea.bash`
-  - Zsh: `pea completion zsh > ~/.pea/_pea`
-- Automatic install to `~/.pea/`: `pea completion install`
-- Add to your shell profile to source these files as desired
+**Environment Variables:**
+*   `PEA_STORE`: Override the storage directory path.
 
-## 🔀 Git-backed versioning
-- The store directory is initialized as a Git repo on first use
-- `add`, `rm`, and `mv` attempt to create commits for changes (best-effort; does not fail the command on Git errors)
+**Config File:**
+Located at `~/.pea/config.toml`:
+```toml
+store_dir = "/path/to/my/custom/store"
+```
+
+## 🔮 Shell Completion
+
+Get super-fast autocomplete for both commands and your stored snippet names.
+
+**Install (Recommended):**
+```bash
+# Installs scripts to ~/.pea/ and prints setup instructions
+pea completion install
+```
+
+**Manual Generation:**
+```bash
+pea completion bash > ~/.bash_completion
+pea completion zsh > ~/.zshrc
+```
 
 ## 🧑‍💻 Development
-- Requirements: Go 1.25+, macOS (for v0 clipboard behavior)
-- Common tasks (requires `just`):
-  - `just build` — build local binary to `bin/pea`
-  - `just test` — run tests
-  - `just check` — fmt, vet, and test
-  - `just tidy` — `go mod tidy`
-- Without `just`:
-  - `go build -o bin/pea .`
-  - `go test ./...`
 
-## ✅ Testing
-- End-to-end tests live under `./e2e` and exercise CLI behavior (add/retrieve/list/delete/rename, completion, config, clipboard)
-- Run: `go test ./e2e` or `just test`
+Requirements: **Go 1.25+**, **Make** (or `just`).
 
-## 🗺️ Roadmap
-- Cross-platform clipboard abstraction (Linux/Windows)
-- Richer metadata handling and commands
-- Additional safety and UX polish
+```bash
+# Build binary
+just build
 
-## 📝 Notes
-- Latest stable library versions are used (e.g., cobra/pflag/toml); run `go mod tidy` as needed
-- v0 targets macOS and a simple, predictable CLI UX
+# Run all tests (Unit + E2E)
+just check
+
+# Run specific E2E tests
+go test -v ./e2e
+```
+
+## 📄 License
+
+MIT
