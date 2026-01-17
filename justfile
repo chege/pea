@@ -1,7 +1,7 @@
 # Tasks for pea (Go CLI)
 set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
-bin := "bin/pea"
+bin := "pea"
 
 # Default lists available tasks
 default: help
@@ -11,7 +11,6 @@ help:
 
 # Build a local binary
 build:
-  mkdir -p bin
   go build -o {{bin}} .
 
 # Run the app with optional args: `just run -- --flag value`
@@ -55,4 +54,4 @@ pre-commit: check
 
 # Clean build artifacts
 clean:
-  rm -rf bin
+  rm -f {{bin}}

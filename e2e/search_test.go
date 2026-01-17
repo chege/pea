@@ -58,6 +58,12 @@ How to cook pasta.`,
 			notWant: []string{"cooking_pasta"},
 		},
 		{
+			name: "search by content",
+			args: []string{"search", "pasta"},
+			want: []string{"cooking_pasta"},
+			notWant: []string{"golang_basics", "rust_basics"},
+		},
+		{
 			name: "search by tag",
 			args: []string{"search", "--tag", "go"},
 			want: []string{"golang_basics"},

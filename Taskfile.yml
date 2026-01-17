@@ -11,10 +11,9 @@ tasks:
       - task -l
 
   build:
-    desc: Build CLI to bin/pea
+    desc: Build CLI to pea
     cmds:
-      - mkdir -p bin
-      - go build -o bin/pea .
+      - go build -o pea .
 
   run:
     desc: Run the app with optional args

@@ -32,13 +32,24 @@ func addSearchCommand(root *cobra.Command) {
 
 			var out []string
 			for _, e := range entries {
-				if query != "" && !strings.Contains(strings.ToLower(e.name), query) {
-					continue
+				match := false
+				if query == "" {
+					match = true
+				} else {
+					if strings.Contains(strings.ToLower(e.name), query) {
+						match = true
+					} else if strings.Contains(strings.ToLower(e.content), query) {
+						match = true
+					}
 				}
-				if len(tags) > 0 && !hasAllTags(e.tags, tags) {
-					continue
+
+				if match && len(tags) > 0 && !hasAllTags(e.tags, tags) {
+					match = false
 				}
-				out = append(out, e.name)
+
+				if match {
+					out = append(out, e.name)
+				}
 			}
 
 			for _, name := range out {
@@ -54,8 +65,9 @@ func addSearchCommand(root *cobra.Command) {
 }
 
 type entryWithTags struct {
-	name string
-	tags []string
+	name    string
+	tags    []string
+	content string
 }
 
 func collectEntriesWithTags(store string) ([]entryWithTags, error) {
@@ -89,8 +101,9 @@ func collectEntriesWithTags(store string) ([]entryWithTags, error) {
 			continue
 		}
 		entries = append(entries, entryWithTags{
-			name: base,
-			tags: parseTags(b),
+			name:    base,
+			tags:    parseTags(b),
+			content: string(b),
 		})
 	}
 	return entries, nil

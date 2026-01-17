@@ -10,6 +10,7 @@ Status: v0.1.0 (macOS focus). Core commands implemented: add, retrieve, ls, rm, 
 - Add content three ways: stdin, import a file, or open $EDITOR
 - Discover: `pea ls` lists names (sorted)
 - Manage: `pea rm <name>` and `pea mv <old> <new>`
+- Search: `pea search <query>` finds entries by name, content, or tags
 - Shell completion: `pea completion bash|zsh` and `pea completion install`
 - Configurable storage dir via env or TOML config
 - Git-backed changes: store is a Git repo; add/rm/mv create commits (best-effort)
@@ -46,6 +47,8 @@ pea rm hello
 - `pea ls` — list entry names (sorted)
 - `pea rm <name>` — delete entry (Git commit best-effort)
 - `pea mv <old> <new>` — rename entry (Git commit best-effort)
+- `pea search <query>` — search entries by name substring, content, or tags
+  - filter by tag: `pea search --tag coding`
 - `pea completion [bash|zsh]` — output completion script (redirect to your shell’s completion directory)
 
 Run `pea --help` or `pea <command> --help` for usage.
