@@ -15,9 +15,10 @@ func addHistoryCommand(root *cobra.Command) {
 	var reverse bool
 
 	cmd := &cobra.Command{
-		Use:   "history <name>",
-		Short: "show git history for an entry",
-		Args:  cobra.ExactArgs(1),
+		Use:               "history <name>",
+		Short:             "show git history for an entry",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: completeNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := app.EnsureStore()
 			if err != nil {

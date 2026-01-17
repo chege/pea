@@ -18,10 +18,11 @@ func NewRootCmd() *cobra.Command {
 	base, defaultStore := app.DefaultPaths()
 	cfgPath := filepath.Join(base, "config.toml")
 	cmd := &cobra.Command{
-		Use:   "pea [name]",
-		Short: "pea: fast local prompt storage & retrieval",
-		Long:  fmt.Sprintf("pea is a fast, local CLI to store short text under names and retrieve it instantly.\n\nDefaults: store at %s; config at %s; env override: PEA_STORE (highest precedence).", defaultStore, cfgPath),
-		Args:  cobra.MaximumNArgs(1),
+		Use:               "pea [name]",
+		Short:             "pea: fast local prompt storage & retrieval",
+		Long:              fmt.Sprintf("pea is a fast, local CLI to store short text under names and retrieve it instantly.\n\nDefaults: store at %s; config at %s; env override: PEA_STORE (highest precedence).", defaultStore, cfgPath),
+		Args:              cobra.MaximumNArgs(1),
+		ValidArgsFunction: completeNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if len(args) == 1 {
