@@ -23,11 +23,10 @@ func TestRetrieveByName(t *testing.T) {
 	}
 
 	// Retrieve
-	out, err := exec.Command(bin, "greet").CombinedOutput()
-
+	out, err := exec.Command(bin, "get", "greet").CombinedOutput()
 	if err != nil {
-
 		t.Fatalf("retrieve failed: %v\n%s", err, out)
+
 	}
 
 	if string(out) != "Hello\n" {

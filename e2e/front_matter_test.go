@@ -26,12 +26,9 @@ func TestRetrieveStripsFrontMatter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cmd := exec.Command(bin, "fm_test")
-
-	cmd.Env = append(os.Environ(), "PEA_STORE="+store)
-
+	// Retrieve (should strip front matter)
+	cmd := exec.Command(bin, "get", "fm_test")
 	out, err := cmd.CombinedOutput()
-
 	if err != nil {
 
 		t.Fatalf("retrieve failed: %v\n%s", err, out)

@@ -31,7 +31,7 @@ func TestDeleteEntry(t *testing.T) {
 	}
 
 	// Ensure retrieval fails
-	get := exec.Command(bin, "temp")
+	get := exec.Command(bin, "get", "temp")
 
 	if err := get.Run(); err == nil {
 

@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -8,20 +9,26 @@ import (
 
 func TestGetAtRevision(t *testing.T) {
 	bin := buildBinary(t)
+	tmp := t.TempDir()
 
 	cmd := exec.Command(bin, "add", "rev_entry")
+	cmd.Env = append(os.Environ(), "PEA_STORE="+tmp)
 	cmd.Stdin = strings.NewReader("v1\n")
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("add v1 failed: %v\n%s", err, out)
 	}
 
 	cmd = exec.Command(bin, "add", "rev_entry")
+	cmd.Env = append(os.Environ(), "PEA_STORE="+tmp)
 	cmd.Stdin = strings.NewReader("v2\n")
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("add v2 failed: %v\n%s", err, out)
 	}
 
-	get := exec.Command(bin, "--rev", "HEAD~1", "rev_entry")
+	// Retrieve previous version
+	// pea get --rev HEAD~1 rev_entry
+	get := exec.Command(bin, "get", "--rev", "HEAD~1", "rev_entry")
+	get.Env = append(os.Environ(), "PEA_STORE="+tmp)
 	out, err := get.CombinedOutput()
 	if err != nil {
 		t.Fatalf("get at rev failed: %v\n%s", err, out)
@@ -33,8 +40,12 @@ func TestGetAtRevision(t *testing.T) {
 
 func TestGetAtMissingRevision(t *testing.T) {
 	bin := buildBinary(t)
-	cmd := exec.Command(bin, "--rev", "doesnotexist", "missing_rev")
+	tmp := t.TempDir()
+
+	cmd := exec.Command(bin, "get", "--rev", "doesnotexist", "missing_rev")
+	cmd.Env = append(os.Environ(), "PEA_STORE="+tmp)
 	out, err := cmd.CombinedOutput()
+
 	if err == nil {
 		t.Fatalf("expected failure for missing ref")
 	}

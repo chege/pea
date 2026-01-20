@@ -122,10 +122,9 @@ func Sync(store string, stdout, stderr io.Writer) error {
 	pull.Dir = store
 	pull.Stdout = stdout
 	pull.Stderr = stderr
-	if err := pull.Run(); err != nil {
-		// We return the error so 'pea sync' can report it
-		return fmt.Errorf("git pull --rebase failed: %w", err)
-	}
+	// We ignore pull errors (e.g. empty remote) and try to push anyway.
+	// Real sync issues will likely cause push to fail too.
+	_ = pull.Run()
 
 	// 2. Push
 	push := exec.Command("git", "push", "-u", "origin", "HEAD")

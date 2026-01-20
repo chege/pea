@@ -12,7 +12,7 @@
 
 ## ✨ Features
 
-- **🚀 Instant Retrieval:** `pea <name>` prints content to stdout.
+- **🚀 Instant Retrieval:** `pea get <name>` prints content to stdout.
 - **📋 Smart Clipboard:** Auto-copies content to clipboard when running in a terminal (TTY).
 - **🔎 Powerful Search:** Find entries by name, content, or tags.
 - **📂 Plain Files:** Stores everything as simple `.md` files in `~/.pea/prompts`.
@@ -30,7 +30,7 @@ go install github.com/user/pea@latest
 echo "Hello, world!" | pea add hello
 
 # 3. Retrieve it (copies to clipboard automatically!)
-pea hello
+pea get hello
 
 # 4. List all snippets
 pea ls
@@ -42,7 +42,8 @@ pea ls
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| **Retrieve** | `pea <name>` | Print content (and copy to clipboard). |
+| **Retrieve** | `pea get <name>` | Print content (and copy to clipboard). |
+| **Copy** | `pea cp <name>` | Copy content to clipboard (no print). |
 | **Add** | `pea add <name>` | Create/Edit via `$EDITOR` or stdin. |
 | **List** | `pea ls` | List all entry names. |
 | **Search** | `pea search <query>` | Search by name, content, or tags. |
