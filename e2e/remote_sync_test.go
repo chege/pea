@@ -48,3 +48,50 @@ func TestRemoteSyncPushesWhenConfigured(t *testing.T) {
 		t.Fatalf("remote missing commit: %v\n%s", err, out)
 	}
 }
+
+func TestRemoteCommand(t *testing.T) {
+	bin := buildBinary(t)
+
+	home, err := os.MkdirTemp("", "pea-remote-cmd-home-")
+	if err != nil {
+		t.Fatalf("mkdtemp: %v", err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(home) })
+
+	base := filepath.Join(home, ".pea")
+	store := filepath.Join(base, "prompts")
+	remote := filepath.Join(home, "remote.git")
+
+	// Init bare remote
+	if out, err := exec.Command("git", "init", "--bare", remote).CombinedOutput(); err != nil {
+		t.Fatalf("init bare: %v\n%s", err, out)
+	}
+
+	// Run 'pea remote <url>'
+	cmd := exec.Command(bin, "remote", remote)
+	cmd.Env = append(os.Environ(), "HOME="+home)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("pea remote failed: %v\n%s", err, out)
+	}
+
+	// Verify config.toml
+	cfg := filepath.Join(base, "config.toml")
+	content, err := os.ReadFile(cfg)
+	if err != nil {
+		t.Fatalf("read config: %v", err)
+	}
+	if !strings.Contains(string(content), remote) {
+		t.Errorf("config does not contain remote url: %s", string(content))
+	}
+
+	// Verify git remote in store
+	remoteCmd := exec.Command("git", "remote", "get-url", "origin")
+	remoteCmd.Dir = store
+	out, err := remoteCmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git remote get-url failed: %v", err)
+	}
+	if strings.TrimSpace(string(out)) != remote {
+		t.Errorf("git remote url mismatch: got %q, want %q", string(out), remote)
+	}
+}

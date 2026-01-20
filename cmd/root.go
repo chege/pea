@@ -75,6 +75,7 @@ func NewRootCmd() *cobra.Command {
 	addHistoryCommand(cmd)
 	addSearchCommand(cmd)
 	addCompletionCommand(cmd)
+	addRemoteCommand(cmd)
 	cmd.Flags().StringVar(&rev, "rev", "", "read entry content from a specific git ref")
 	return cmd
 }

@@ -49,6 +49,7 @@ pea ls
 | **Remove** | `pea rm <name>` | Delete an entry (versioned). |
 | **Move** | `pea mv <old> <new>` | Rename an entry (versioned). |
 | **History** | `pea history <name>` | View Git history of an entry. |
+| **Remote** | `pea remote <url>` | Configure remote git sync. |
 
 ### Adding Content
 

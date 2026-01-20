@@ -51,11 +51,13 @@ func EnsureStore() (string, error) {
 	return prepareStore(store, "config", remote)
 }
 
+type Config struct {
+	StoreDir  string `toml:"store_dir,omitempty"`
+	RemoteURL string `toml:"remote_url,omitempty"`
+}
+
 func loadConfig(cfgPath, defaultStore string) (string, string, error) {
-	var conf struct {
-		StoreDir  string `toml:"store_dir"`
-		RemoteURL string `toml:"remote_url"`
-	}
+	var conf Config
 
 	if _, err := toml.DecodeFile(cfgPath, &conf); err != nil {
 		return "", "", fmt.Errorf("invalid config %s: %w", cfgPath, err)
@@ -72,6 +74,52 @@ func loadConfig(cfgPath, defaultStore string) (string, string, error) {
 
 	remote := conf.RemoteURL
 	return store, remote, nil
+}
+
+func UpdateRemoteURL(url string) error {
+	base, _ := DefaultPaths()
+	cfgPath := filepath.Join(base, "config.toml")
+
+	if err := os.MkdirAll(base, 0o755); err != nil {
+		return fmt.Errorf("failed to create base dir %s: %w", base, err)
+	}
+
+	var conf Config
+	if _, err := os.Stat(cfgPath); err == nil {
+		if _, err := toml.DecodeFile(cfgPath, &conf); err != nil {
+			return fmt.Errorf("invalid config %s: %w", cfgPath, err)
+		}
+	}
+
+	conf.RemoteURL = url
+
+	f, err := os.Create(cfgPath)
+	if err != nil {
+		return fmt.Errorf("failed to open config file %s: %w", cfgPath, err)
+	}
+	defer f.Close()
+
+	if err := toml.NewEncoder(f).Encode(conf); err != nil {
+		return fmt.Errorf("failed to write config: %w", err)
+	}
+	return nil
+}
+
+func SetGitRemote(store, remote string) error {
+	// Try to set-url first (if it exists)
+	cmd := exec.Command("git", "remote", "set-url", "origin", remote)
+	cmd.Dir = store
+	if err := cmd.Run(); err == nil {
+		return nil
+	}
+
+	// If set-url failed, try adding it
+	add := exec.Command("git", "remote", "add", "origin", remote)
+	add.Dir = store
+	if out, err := add.CombinedOutput(); err != nil {
+		return fmt.Errorf("git remote add/set-url failed: %v: %s", err, string(out))
+	}
+	return nil
 }
 
 func prepareStore(store, source, remote string) (string, error) {
