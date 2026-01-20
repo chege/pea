@@ -36,7 +36,20 @@ func EnsureStore() (string, error) {
 
 	cfgPath := filepath.Join(base, "config.toml")
 	if _, err := os.Stat(cfgPath); errors.Is(err, os.ErrNotExist) {
-		content := "# pea config\n# store_dir = \"" + defaultStore + "\"\n"
+		content := `# pea config
+
+# Directory where snippets are stored (must be an absolute path)
+store_dir = "` + defaultStore + `"
+
+# Enable or disable git versioning (default: true)
+# git = true
+
+# Preferred editor for adding/editing snippets (e.g., "vim", "code --wait")
+# editor = "vim"
+
+# Remote git URL for synchronization (typically set via 'pea remote')
+# remote_url = ""
+`
 		if err := os.WriteFile(cfgPath, []byte(content), 0o644); err != nil {
 			return "", fmt.Errorf("failed to write default config %s: %w", cfgPath, err)
 		}
