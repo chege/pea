@@ -50,6 +50,7 @@ pea ls
 | **Move** | `pea mv <old> <new>` | Rename an entry (versioned). |
 | **History** | `pea history <name>` | View Git history of an entry. |
 | **Remote** | `pea remote <url>` | Configure remote git sync. |
+| **Create Repo** | `pea remote create <name>` | Create & sync with a new GitHub repo. |
 
 ### Adding Content
 
