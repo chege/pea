@@ -25,7 +25,7 @@ func DefaultPaths() (base string, store string) {
 func EnsureStore() (string, error) {
 	if v := os.Getenv("PEA_STORE"); v != "" {
 		ConfiguredRemote = ""
-		return prepareStore(v, "PEA_STORE", "")
+		return prepareStore(v, "PEA_STORE", "", false)
 	}
 
 	base, defaultStore := DefaultPaths()
@@ -42,25 +42,26 @@ func EnsureStore() (string, error) {
 		}
 	}
 
-	store, remote, err := loadConfig(cfgPath, defaultStore)
+	store, remote, noGit, err := loadConfig(cfgPath, defaultStore)
 	if err != nil {
 		return "", err
 	}
 	ConfiguredRemote = remote
 
-	return prepareStore(store, "config", remote)
+	return prepareStore(store, "config", remote, noGit)
 }
 
 type Config struct {
 	StoreDir  string `toml:"store_dir,omitempty"`
 	RemoteURL string `toml:"remote_url,omitempty"`
+	NoGit     bool   `toml:"no_git,omitempty"`
 }
 
-func loadConfig(cfgPath, defaultStore string) (string, string, error) {
+func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
 	var conf Config
 
 	if _, err := toml.DecodeFile(cfgPath, &conf); err != nil {
-		return "", "", fmt.Errorf("invalid config %s: %w", cfgPath, err)
+		return "", "", false, fmt.Errorf("invalid config %s: %w", cfgPath, err)
 	}
 
 	store := defaultStore
@@ -69,11 +70,11 @@ func loadConfig(cfgPath, defaultStore string) (string, string, error) {
 	}
 
 	if !filepath.IsAbs(store) {
-		return "", "", fmt.Errorf("invalid config %s: store_dir must be an absolute path, got %q", cfgPath, store)
+		return "", "", false, fmt.Errorf("invalid config %s: store_dir must be an absolute path, got %q", cfgPath, store)
 	}
 
 	remote := conf.RemoteURL
-	return store, remote, nil
+	return store, remote, conf.NoGit, nil
 }
 
 func UpdateRemoteURL(url string) error {
@@ -122,7 +123,7 @@ func SetGitRemote(store, remote string) error {
 	return nil
 }
 
-func prepareStore(store, source, remote string) (string, error) {
+func prepareStore(store, source, remote string, noGit bool) (string, error) {
 	if !filepath.IsAbs(store) {
 		return "", fmt.Errorf("%s must be an absolute path, got %q", source, store)
 	}
@@ -131,8 +132,10 @@ func prepareStore(store, source, remote string) (string, error) {
 		return "", fmt.Errorf("failed to create store dir %s: %w", store, err)
 	}
 
-	if err := ensureGitRepo(store, remote); err != nil {
-		return "", err
+	if !noGit {
+		if err := ensureGitRepo(store, remote); err != nil {
+			return "", err
+		}
 	}
 
 	return store, nil

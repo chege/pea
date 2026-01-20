@@ -3,13 +3,23 @@ package app
 import (
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
+
+func hasGit(store string) bool {
+	_, err := os.Stat(filepath.Join(store, ".git"))
+	return err == nil
+}
 
 // GitAddAndCommit attempts to stage the provided paths and commit with commitMsg.
 // It logs failures to stderr but does not block the calling command.
 func GitAddAndCommit(store string, paths []string, commitMsg string, stderr io.Writer) {
+	if !hasGit(store) {
+		return
+	}
 	if stderr == nil {
 		stderr = io.Discard
 	}
@@ -33,6 +43,9 @@ func GitAddAndCommit(store string, paths []string, commitMsg string, stderr io.W
 // GitRmAndCommit attempts to stage deletions and commit with commitMsg.
 // It logs failures to stderr but does not block the calling command.
 func GitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Writer) {
+	if !hasGit(store) {
+		return
+	}
 	if stderr == nil {
 		stderr = io.Discard
 	}
@@ -54,6 +67,9 @@ func GitRmAndCommit(store string, paths []string, commitMsg string, stderr io.Wr
 }
 
 func RevertLastCommitForPath(store, path string, stderr io.Writer) error {
+	if !hasGit(store) {
+		return fmt.Errorf("git is not enabled for this store")
+	}
 	if stderr == nil {
 		stderr = io.Discard
 	}
@@ -77,6 +93,9 @@ func RevertLastCommitForPath(store, path string, stderr io.Writer) error {
 }
 
 func PushIfRemote(store string, stderr io.Writer) {
+	if !hasGit(store) {
+		return
+	}
 	if stderr == nil {
 		stderr = io.Discard
 	}
