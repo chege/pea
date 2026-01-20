@@ -100,6 +100,17 @@ func runCreateRemote(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// 4.1 Check if there are commits; if not, create initial commit
+	if err := exec.Command("git", "-C", store, "rev-parse", "--verify", "HEAD").Run(); err != nil {
+		// HEAD not found, create initial commit
+		fmt.Println("No commits found. Creating initial commit...")
+		initCommit := exec.Command("git", "commit", "--allow-empty", "-m", "chore: initial commit")
+		initCommit.Dir = store
+		if out, err := initCommit.CombinedOutput(); err != nil {
+			return fmt.Errorf("failed to create initial commit: %v\n%s", err, out)
+		}
+	}
+
 	// 5. Run gh repo create
 	// gh repo create <name> --private --source=. --remote=origin --push
 	ghArgs := []string{
