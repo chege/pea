@@ -25,7 +25,7 @@ func DefaultPaths() (base string, store string) {
 func EnsureStore() (string, error) {
 	if v := os.Getenv("PEA_STORE"); v != "" {
 		ConfiguredRemote = ""
-		return prepareStore(v, "PEA_STORE", "", false)
+		return prepareStore(v, "PEA_STORE", "", true)
 	}
 
 	base, defaultStore := DefaultPaths()
@@ -42,19 +42,19 @@ func EnsureStore() (string, error) {
 		}
 	}
 
-	store, remote, noGit, err := loadConfig(cfgPath, defaultStore)
+	store, remote, enableGit, err := loadConfig(cfgPath, defaultStore)
 	if err != nil {
 		return "", err
 	}
 	ConfiguredRemote = remote
 
-	return prepareStore(store, "config", remote, noGit)
+	return prepareStore(store, "config", remote, enableGit)
 }
 
 type Config struct {
 	StoreDir  string `toml:"store_dir,omitempty"`
 	RemoteURL string `toml:"remote_url,omitempty"`
-	NoGit     bool   `toml:"no_git,omitempty"`
+	Git       *bool  `toml:"git,omitempty"`
 }
 
 func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
@@ -74,7 +74,14 @@ func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
 	}
 
 	remote := conf.RemoteURL
-	return store, remote, conf.NoGit, nil
+
+	// Default to true if not specified
+	enableGit := true
+	if conf.Git != nil {
+		enableGit = *conf.Git
+	}
+
+	return store, remote, enableGit, nil
 }
 
 func UpdateRemoteURL(url string) error {
@@ -123,7 +130,7 @@ func SetGitRemote(store, remote string) error {
 	return nil
 }
 
-func prepareStore(store, source, remote string, noGit bool) (string, error) {
+func prepareStore(store, source, remote string, enableGit bool) (string, error) {
 	if !filepath.IsAbs(store) {
 		return "", fmt.Errorf("%s must be an absolute path, got %q", source, store)
 	}
@@ -132,7 +139,7 @@ func prepareStore(store, source, remote string, noGit bool) (string, error) {
 		return "", fmt.Errorf("failed to create store dir %s: %w", store, err)
 	}
 
-	if !noGit {
+	if enableGit {
 		if err := ensureGitRepo(store, remote); err != nil {
 			return "", err
 		}
@@ -142,6 +149,11 @@ func prepareStore(store, source, remote string, noGit bool) (string, error) {
 }
 
 func ensureGitRepo(store, remote string) error {
+	// Check if git is installed
+	if _, err := exec.LookPath("git"); err != nil {
+		return nil
+	}
+
 	if _, err := os.Stat(filepath.Join(store, ".git")); err == nil {
 		// configure remote if provided and not set
 		if remote != "" {
