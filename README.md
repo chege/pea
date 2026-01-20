@@ -51,6 +51,7 @@ pea ls
 | **History** | `pea history <name>` | View Git history of an entry. |
 | **Remote** | `pea remote <url>` | Configure remote git sync. |
 | **Create Repo** | `pea remote create <name>` | Create & sync with a new GitHub repo. |
+| **Sync** | `pea sync` | Manual git pull (rebase) & push. |
 
 ### Adding Content
 

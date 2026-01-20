@@ -40,18 +40,13 @@ func addRemoteCommand(root *cobra.Command) {
 }
 
 func runSetRemote(cmd *cobra.Command, url string) error {
-	// 1. Update config file
-	if err := app.UpdateRemoteURL(url); err != nil {
-		return fmt.Errorf("failed to update config: %w", err)
-	}
-
-	// 2. Ensure store is loaded and get path
+	// 1. Ensure store is loaded and get path
 	store, err := app.EnsureStore()
 	if err != nil {
 		return err
 	}
 
-	// 3. Configure git remote (force update)
+	// 2. Configure git remote (force update)
 	if err := app.SetGitRemote(store, url); err != nil {
 		return err
 	}
@@ -129,18 +124,13 @@ func runCreateRemote(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to create repository: %w", err)
 	}
 
-	// 6. Get the new remote URL to save to config
-	// The gh command sets the remote, but we want it in our config.toml too.
+	// 6. Get the new remote URL (optional check)
 	remoteURLBytes, err := exec.Command("git", "-C", store, "remote", "get-url", "origin").Output()
 	if err != nil {
-		// Fallback: construct it manually if git fails (unlikely if gh succeeded)
-		// but let's just warn.
 		fmt.Printf("Warning: could not retrieve remote URL from git: %v\n", err)
 	} else {
-		remoteURL := strings.TrimSpace(string(remoteURLBytes))
-		if err := app.UpdateRemoteURL(remoteURL); err != nil {
-			fmt.Printf("Warning: failed to update config.toml with new remote: %v\n", err)
-		}
+		// Just print it for verification
+		fmt.Printf("Linked to remote: %s\n", strings.TrimSpace(string(remoteURLBytes)))
 	}
 
 	fmt.Println("\n✅ Repository created and linked successfully!")

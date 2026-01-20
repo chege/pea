@@ -93,21 +93,48 @@ func RevertLastCommitForPath(store, path string, stderr io.Writer) error {
 }
 
 func PushIfRemote(store string, stderr io.Writer) {
+	// Quiet sync: discard stdout, log errors to stderr
+	_ = Sync(store, io.Discard, stderr)
+}
+
+// Sync performs a git pull --rebase and git push.
+// It writes output to the provided writers.
+func Sync(store string, stdout, stderr io.Writer) error {
 	if !hasGit(store) {
-		return
+		return fmt.Errorf("git is not enabled")
 	}
 	if stderr == nil {
 		stderr = io.Discard
 	}
+	if stdout == nil {
+		stdout = io.Discard
+	}
+
+	// Check if remote exists
 	remoteCmd := exec.Command("git", "config", "--get", "remote.origin.url")
 	remoteCmd.Dir = store
-	out, err := remoteCmd.CombinedOutput()
-	if err != nil || strings.TrimSpace(string(out)) == "" {
-		return
+	if err := remoteCmd.Run(); err != nil {
+		return nil // No remote configured, nothing to do
 	}
+
+	// 1. Pull --rebase
+	pull := exec.Command("git", "pull", "--rebase", "origin", "HEAD")
+	pull.Dir = store
+	pull.Stdout = stdout
+	pull.Stderr = stderr
+	if err := pull.Run(); err != nil {
+		// We return the error so 'pea sync' can report it
+		return fmt.Errorf("git pull --rebase failed: %w", err)
+	}
+
+	// 2. Push
 	push := exec.Command("git", "push", "-u", "origin", "HEAD")
 	push.Dir = store
-	if out, err := push.CombinedOutput(); err != nil {
-		fmt.Fprintf(stderr, "warning: git push failed: %v: %s\n", err, string(out))
+	push.Stdout = stdout
+	push.Stderr = stderr
+	if err := push.Run(); err != nil {
+		return fmt.Errorf("git push failed: %w", err)
 	}
+
+	return nil
 }

@@ -84,35 +84,6 @@ func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
 	return store, remote, enableGit, nil
 }
 
-func UpdateRemoteURL(url string) error {
-	base, _ := DefaultPaths()
-	cfgPath := filepath.Join(base, "config.toml")
-
-	if err := os.MkdirAll(base, 0o755); err != nil {
-		return fmt.Errorf("failed to create base dir %s: %w", base, err)
-	}
-
-	var conf Config
-	if _, err := os.Stat(cfgPath); err == nil {
-		if _, err := toml.DecodeFile(cfgPath, &conf); err != nil {
-			return fmt.Errorf("invalid config %s: %w", cfgPath, err)
-		}
-	}
-
-	conf.RemoteURL = url
-
-	f, err := os.Create(cfgPath)
-	if err != nil {
-		return fmt.Errorf("failed to open config file %s: %w", cfgPath, err)
-	}
-	defer f.Close()
-
-	if err := toml.NewEncoder(f).Encode(conf); err != nil {
-		return fmt.Errorf("failed to write config: %w", err)
-	}
-	return nil
-}
-
 func SetGitRemote(store, remote string) error {
 	// Try to set-url first (if it exists)
 	cmd := exec.Command("git", "remote", "set-url", "origin", remote)
@@ -168,8 +139,17 @@ func ensureGitRepo(store, remote string) error {
 
 	cmds := [][]string{
 		{"init"},
-		{"config", "user.name", "pea"},
-		{"config", "user.email", "pea@example.com"},
+	}
+
+	// Check if user.name/email are configured globally or locally
+	hasName := exec.Command("git", "config", "user.name").Run() == nil
+	hasEmail := exec.Command("git", "config", "user.email").Run() == nil
+
+	if !hasName {
+		cmds = append(cmds, []string{"config", "user.name", "pea"})
+	}
+	if !hasEmail {
+		cmds = append(cmds, []string{"config", "user.email", "pea@example.com"})
 	}
 
 	for _, args := range cmds {

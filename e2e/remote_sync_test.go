@@ -74,16 +74,6 @@ func TestRemoteCommand(t *testing.T) {
 		t.Fatalf("pea remote failed: %v\n%s", err, out)
 	}
 
-	// Verify config.toml
-	cfg := filepath.Join(base, "config.toml")
-	content, err := os.ReadFile(cfg)
-	if err != nil {
-		t.Fatalf("read config: %v", err)
-	}
-	if !strings.Contains(string(content), remote) {
-		t.Errorf("config does not contain remote url: %s", string(content))
-	}
-
 	// Verify git remote in store
 	remoteCmd := exec.Command("git", "remote", "get-url", "origin")
 	remoteCmd.Dir = store
