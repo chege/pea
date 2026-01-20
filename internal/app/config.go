@@ -42,7 +42,7 @@ func EnsureStore() (string, error) {
 		}
 	}
 
-	store, remote, enableGit, err := loadConfig(cfgPath, defaultStore)
+	store, remote, enableGit, _, err := loadConfig(cfgPath, defaultStore)
 	if err != nil {
 		return "", err
 	}
@@ -55,13 +55,43 @@ type Config struct {
 	StoreDir  string `toml:"store_dir,omitempty"`
 	RemoteURL string `toml:"remote_url,omitempty"`
 	Git       *bool  `toml:"git,omitempty"`
+	Editor    string `toml:"editor,omitempty"`
 }
 
-func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
+func GetEditorConfig() string {
+	if v := os.Getenv("PEA_EDITOR"); v != "" {
+		return v
+	}
+	base, defaultStore := DefaultPaths()
+	cfgPath := filepath.Join(base, "config.toml")
+	_, _, _, editor, _ := loadConfig(cfgPath, defaultStore)
+	if editor != "" {
+		return editor
+	}
+	if v := os.Getenv("VISUAL"); v != "" {
+		return v
+	}
+	if v := os.Getenv("EDITOR"); v != "" {
+		return v
+	}
+	// Fallbacks
+	if _, err := exec.LookPath("vim"); err == nil {
+		return "vim"
+	}
+	if _, err := exec.LookPath("nano"); err == nil {
+		return "nano"
+	}
+	if _, err := exec.LookPath("vi"); err == nil {
+		return "vi"
+	}
+	return ""
+}
+
+func loadConfig(cfgPath, defaultStore string) (string, string, bool, string, error) {
 	var conf Config
 
 	if _, err := toml.DecodeFile(cfgPath, &conf); err != nil {
-		return "", "", false, fmt.Errorf("invalid config %s: %w", cfgPath, err)
+		return "", "", false, "", fmt.Errorf("invalid config %s: %w", cfgPath, err)
 	}
 
 	store := defaultStore
@@ -70,7 +100,7 @@ func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
 	}
 
 	if !filepath.IsAbs(store) {
-		return "", "", false, fmt.Errorf("invalid config %s: store_dir must be an absolute path, got %q", cfgPath, store)
+		return "", "", false, "", fmt.Errorf("invalid config %s: store_dir must be an absolute path, got %q", cfgPath, store)
 	}
 
 	remote := conf.RemoteURL
@@ -81,7 +111,7 @@ func loadConfig(cfgPath, defaultStore string) (string, string, bool, error) {
 		enableGit = *conf.Git
 	}
 
-	return store, remote, enableGit, nil
+	return store, remote, enableGit, conf.Editor, nil
 }
 
 func SetGitRemote(store, remote string) error {

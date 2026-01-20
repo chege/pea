@@ -44,7 +44,7 @@ pea ls
 | :--- | :--- | :--- |
 | **Retrieve** | `pea get <name>` | Print content (and copy to clipboard). |
 | **Copy** | `pea cp <name>` | Copy content to clipboard (no print). |
-| **Add** | `pea add <name>` | Create/Edit via `$EDITOR` or stdin. |
+| **Add** | `pea add [name]` | Create/Edit (interactive if name omitted). |
 | **List** | `pea ls` | List all entry names. |
 | **Search** | `pea search <query>` | Search by name, content, or tags. |
 | **Remove** | `pea rm <name>` | Delete an entry (versioned). |
@@ -100,6 +100,7 @@ pea search --tag work        # Filter by tag
 Located at `~/.pea/config.toml`:
 ```toml
 store_dir = "/path/to/my/custom/store"
+editor = "code --wait"  # Optional: configure your preferred editor
 ```
 
 ## 🔮 Shell Completion
