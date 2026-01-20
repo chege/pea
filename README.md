@@ -108,7 +108,7 @@ Get super-fast autocomplete for both commands and your stored snippet names.
 
 **Install (Recommended):**
 ```bash
-# Installs scripts to ~/.pea/ and prints setup instructions
+# Detects your shell (zsh/bash), installs script, and updates your config (~/.zshrc or ~/.bashrc)
 pea completion install
 ```
 

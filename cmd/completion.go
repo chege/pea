@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -24,47 +25,112 @@ func addCompletionCommand(root *cobra.Command) {
 			case "install":
 				home, err := os.UserHomeDir()
 				if err != nil {
-					return fmt.Errorf("resolve home for completion install: %w", err)
+					return fmt.Errorf("resolve home: %w", err)
 				}
 				base := filepath.Join(home, ".pea")
-				if info, err := os.Stat(base); err == nil {
-					if !info.IsDir() {
-						return fmt.Errorf("create completion directory %s: path exists and is not a directory", base)
-					}
-				} else if !os.IsNotExist(err) {
-					return fmt.Errorf("check completion directory %s: %w", base, err)
-				}
 				if err := os.MkdirAll(base, 0o755); err != nil {
-					return fmt.Errorf("create completion directory %s: %w", base, err)
+					return fmt.Errorf("create dir %s: %w", base, err)
 				}
-				bashPath := filepath.Join(base, "pea.bash")
-				zshPath := filepath.Join(base, "_pea")
-				{
-					f, err := os.Create(bashPath)
+
+				shell := filepath.Base(os.Getenv("SHELL"))
+				if shell == "zsh" {
+					path := filepath.Join(base, "_pea")
+					f, err := os.Create(path)
 					if err != nil {
-						return fmt.Errorf("write bash completion %s: %w", bashPath, err)
+						return err
 					}
-					defer func() { _ = f.Close() }()
-					if err := root.GenBashCompletion(f); err != nil {
-						return fmt.Errorf("generate bash completion %s: %w", bashPath, err)
-					}
-				}
-				{
-					f, err := os.Create(zshPath)
-					if err != nil {
-						return fmt.Errorf("write zsh completion %s: %w", zshPath, err)
-					}
-					defer func() { _ = f.Close() }()
 					if err := root.GenZshCompletion(f); err != nil {
-						return fmt.Errorf("generate zsh completion %s: %w", zshPath, err)
+						f.Close()
+						return err
 					}
+					f.Close()
+					fmt.Printf("Installed completion script to %s\n", path)
+
+					// Patch .zshrc
+					rcPath := filepath.Join(home, ".zshrc")
+					cfgLine := fmt.Sprintf("fpath=(%s $fpath); autoload -U compinit; compinit", base)
+					if err := appendIfMissing(rcPath, cfgLine); err != nil {
+						fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
+					} else {
+						fmt.Printf("Updated %s\n", rcPath)
+					}
+					fmt.Printf("\nTo apply changes, run:\n  source %s\n", rcPath)
+
+				} else if shell == "bash" {
+					path := filepath.Join(base, "pea.bash")
+					f, err := os.Create(path)
+					if err != nil {
+						return err
+					}
+					if err := root.GenBashCompletion(f); err != nil {
+						f.Close()
+						return err
+					}
+					f.Close()
+					fmt.Printf("Installed completion script to %s\n", path)
+
+					// Patch .bashrc
+					rcPath := filepath.Join(home, ".bashrc")
+					// Check .bash_profile on Mac if .bashrc doesn't exist?
+					// stick to standard .bashrc for now.
+					cfgLine := fmt.Sprintf("source %s", path)
+					if err := appendIfMissing(rcPath, cfgLine); err != nil {
+						fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
+					} else {
+						fmt.Printf("Updated %s\n", rcPath)
+					}
+					fmt.Printf("\nTo apply changes, run:\n  source %s\n", rcPath)
+
+				} else {
+					// Fallback: install both, print generic
+					bashPath := filepath.Join(base, "pea.bash")
+					zshPath := filepath.Join(base, "_pea")
+
+					f1, _ := os.Create(bashPath)
+					root.GenBashCompletion(f1)
+					f1.Close()
+
+					f2, _ := os.Create(zshPath)
+					root.GenZshCompletion(f2)
+					f2.Close()
+
+					fmt.Printf("Unknown shell '%s'. Installed both scripts to %s\n", shell, base)
+					fmt.Printf("Add the relevant line to your config:\n")
+					fmt.Printf("Bash: source %s\n", bashPath)
+					fmt.Printf("Zsh:  fpath=(%s $fpath); autoload -U compinit; compinit\n", base)
 				}
-				_, err = fmt.Fprintf(cmd.OutOrStdout(), "Completion scripts installed to %s\n\nNote: You must source the installed file or restart your shell to enable completion in the current session.\n\nTo enable permanently, add the following to your shell config:\n\nBash (~/.bashrc):\n  source %s\n\nZsh (~/.zshrc):\n  fpath=(%s $fpath)\n  autoload -U compinit; compinit\n\nTo test immediately in Bash:\n  source <(./pea completion bash)\n\nTo test immediately in Zsh:\n  source <(./pea completion zsh)\n", base, bashPath, base)
-				return err
+				return nil
 			default:
 				return cmd.Help()
 			}
 		},
 	}
 	root.AddCommand(cmd)
+}
+
+func appendIfMissing(path, text string) error {
+	content, err := os.ReadFile(path)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	s := string(content)
+	if strings.Contains(s, text) {
+		return nil // Already present
+	}
+
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	if len(s) > 0 && !strings.HasSuffix(s, "\n") {
+		if _, err := f.WriteString("\n"); err != nil {
+			return err
+		}
+	}
+	if _, err := f.WriteString(text + "\n"); err != nil {
+		return err
+	}
+	return nil
 }
