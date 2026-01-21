@@ -62,7 +62,7 @@ func TestCompletionInstallErrorsAreContextual(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected completion install to fail when HOME is a file, got: %s", out)
 	}
-	if !strings.Contains(string(out), "completion directory") {
+	if !strings.Contains(string(out), "create dir") {
 		t.Fatalf("expected contextual error, got: %s", out)
 	}
 }

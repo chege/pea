@@ -32,6 +32,7 @@ func NewRootCmd() *cobra.Command {
 	addGetCommand(cmd)
 	addCpCommand(cmd)
 	addAddCommand(cmd)
+	addEditCommand(cmd)
 	addRemoveCommand(cmd)
 	addMoveCommand(cmd)
 	addHistoryCommand(cmd)
