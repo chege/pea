@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
 	"pea/internal/app"
 
 	"github.com/spf13/cobra"
@@ -16,6 +17,7 @@ var (
 func NewRootCmd() *cobra.Command {
 	base, defaultStore := app.DefaultPaths()
 	cfgPath := filepath.Join(base, "config.toml")
+
 	cmd := &cobra.Command{
 		Use:   "pea",
 		Short: "pea: fast local prompt storage & retrieval",
@@ -40,6 +42,7 @@ func NewRootCmd() *cobra.Command {
 	addCompletionCommand(cmd)
 	addRemoteCommand(cmd)
 	addSyncCommand(cmd)
+
 	return cmd
 }
 

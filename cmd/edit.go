@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+
 	"pea/internal/app"
 
 	"github.com/spf13/cobra"
@@ -72,5 +73,6 @@ func runEdit(cmd *cobra.Command, nameRaw string) error {
 	app.GitAddAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
 
 	fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+
 	return nil
 }

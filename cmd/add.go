@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"pea/internal/app"
 	"strings"
+
+	"pea/internal/app"
 
 	"github.com/spf13/cobra"
 )
@@ -38,6 +39,7 @@ func runAddInteractive(cmd *cobra.Command) error {
 	if err != nil {
 		return fmt.Errorf("failed to create temp file: %w", err)
 	}
+
 	tmpPath := tmpFile.Name()
 	tmpFile.Close()
 	defer os.Remove(tmpPath)
@@ -52,17 +54,20 @@ func runAddInteractive(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
+
 	if len(bytes.TrimSpace(data)) == 0 {
 		return fmt.Errorf("add aborted: empty content")
 	}
 
 	// Ask for name
 	fmt.Fprintf(cmd.OutOrStdout(), "Enter name: ")
+
 	reader := bufio.NewReader(os.Stdin)
 	nameInput, err := reader.ReadString('\n')
 	if err != nil {
 		return fmt.Errorf("failed to read name: %w", err)
 	}
+
 	name := strings.TrimSpace(nameInput)
 	if name == "" {
 		return fmt.Errorf("add aborted: empty name")
@@ -112,6 +117,7 @@ func runAddNamed(cmd *cobra.Command, args []string) error {
 			if err := openEditor(cmd, path); err != nil {
 				return err
 			}
+
 			fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
 			return nil
 		}
@@ -148,5 +154,6 @@ func saveEntry(cmd *cobra.Command, store, name string, src io.Reader) error {
 	app.GitAddAndCommit(store, []string{name + ext}, commitMsg, cmd.ErrOrStderr())
 
 	fmt.Fprintf(cmd.OutOrStdout(), "%s\n", name)
+
 	return nil
 }

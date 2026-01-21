@@ -23,101 +23,129 @@ func addCompletionCommand(root *cobra.Command) {
 			case "zsh":
 				return root.GenZshCompletion(cmd.OutOrStdout())
 			case "install":
-				home, err := os.UserHomeDir()
-				if err != nil {
-					return fmt.Errorf("resolve home: %w", err)
-				}
-				base := filepath.Join(home, ".pea")
-				if err := os.MkdirAll(base, 0o755); err != nil {
-					return fmt.Errorf("create dir %s: %w", base, err)
-				}
-
-				shell := filepath.Base(os.Getenv("SHELL"))
-				if shell == "zsh" {
-					path := filepath.Join(base, "_pea")
-					f, err := os.Create(path)
-					if err != nil {
-						return err
-					}
-					if err := root.GenZshCompletion(f); err != nil {
-						f.Close()
-						return err
-					}
-					f.Close()
-					fmt.Printf("Installed completion script to %s\n", path)
-
-					// Patch .zshrc
-					rcPath := filepath.Join(home, ".zshrc")
-					cfgLine := fmt.Sprintf("fpath=(%s $fpath); autoload -U compinit; compinit", base)
-					if err := updateShellConfig(rcPath, cfgLine); err != nil {
-						fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
-					} else {
-						fmt.Printf("Updated %s\n", rcPath)
-					}
-					fmt.Printf("\nTo apply changes, run:\n  source %s\n", rcPath)
-
-				} else if shell == "bash" {
-					path := filepath.Join(base, "pea.bash")
-					f, err := os.Create(path)
-					if err != nil {
-						return err
-					}
-					if err := root.GenBashCompletion(f); err != nil {
-						f.Close()
-						return err
-					}
-					f.Close()
-					fmt.Printf("Installed completion script to %s\n", path)
-
-					// Patch .bashrc
-					rcPath := filepath.Join(home, ".bashrc")
-					// Check .bash_profile on Mac if .bashrc doesn't exist?
-					// stick to standard .bashrc for now.
-					cfgLine := fmt.Sprintf("source %s", path)
-					if err := updateShellConfig(rcPath, cfgLine); err != nil {
-						fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
-					} else {
-						fmt.Printf("Updated %s\n", rcPath)
-					}
-					fmt.Printf("\nTo apply changes, run:\n  source %s\n", rcPath)
-
-				} else {
-					// Fallback: install both, print generic
-					bashPath := filepath.Join(base, "pea.bash")
-					zshPath := filepath.Join(base, "_pea")
-
-					f1, err := os.Create(bashPath)
-					if err != nil {
-						fmt.Printf("Warning: failed to create %s: %v\n", bashPath, err)
-					} else {
-						if err := root.GenBashCompletion(f1); err != nil {
-							fmt.Printf("Warning: failed to generate bash completion: %v\n", err)
-						}
-						f1.Close()
-					}
-
-					f2, err := os.Create(zshPath)
-					if err != nil {
-						fmt.Printf("Warning: failed to create %s: %v\n", zshPath, err)
-					} else {
-						if err := root.GenZshCompletion(f2); err != nil {
-							fmt.Printf("Warning: failed to generate zsh completion: %v\n", err)
-						}
-						f2.Close()
-					}
-
-					fmt.Printf("Unknown shell '%s'. Installed both scripts to %s\n", shell, base)
-					fmt.Printf("Add the relevant line to your config:\n")
-					fmt.Printf("Bash: source %s\n", bashPath)
-					fmt.Printf("Zsh:  fpath=(%s $fpath); autoload -U compinit; compinit\n", base)
-				}
-				return nil
+				return runInstallCompletion(root)
 			default:
 				return cmd.Help()
 			}
 		},
 	}
 	root.AddCommand(cmd)
+}
+
+func runInstallCompletion(root *cobra.Command) error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("resolve home: %w", err)
+	}
+
+	base := filepath.Join(home, ".pea")
+	if err := os.MkdirAll(base, 0o755); err != nil {
+		return fmt.Errorf("create dir %s: %w", base, err)
+	}
+
+	shell := filepath.Base(os.Getenv("SHELL"))
+
+	if shell == "zsh" {
+		return installZsh(root, home, base)
+	} else if shell == "bash" {
+		return installBash(root, home, base)
+	}
+
+	return installFallback(root, base, shell)
+}
+
+func installZsh(root *cobra.Command, home, base string) error {
+	path := filepath.Join(base, "_pea")
+
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	if err := root.GenZshCompletion(f); err != nil {
+		f.Close()
+		return err
+	}
+	f.Close()
+
+	fmt.Printf("Installed completion script to %s\n", path)
+
+	// Patch .zshrc
+	rcPath := filepath.Join(home, ".zshrc")
+	cfgLine := fmt.Sprintf("fpath=(%s $fpath); autoload -U compinit; compinit", base)
+
+	if err := updateShellConfig(rcPath, cfgLine); err != nil {
+		fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
+	} else {
+		fmt.Printf("Updated %s\n", rcPath)
+	}
+	fmt.Printf("\nTo apply changes, run:\n  source %s\n", rcPath)
+
+	return nil
+}
+
+func installBash(root *cobra.Command, home, base string) error {
+	path := filepath.Join(base, "pea.bash")
+
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	if err := root.GenBashCompletion(f); err != nil {
+		f.Close()
+		return err
+	}
+	f.Close()
+
+	fmt.Printf("Installed completion script to %s\n", path)
+
+	// Patch .bashrc
+	rcPath := filepath.Join(home, ".bashrc")
+	// Check .bash_profile on Mac if .bashrc doesn't exist?
+	// stick to standard .bashrc for now.
+	cfgLine := fmt.Sprintf("source %s", path)
+
+	if err := updateShellConfig(rcPath, cfgLine); err != nil {
+		fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
+	} else {
+		fmt.Printf("Updated %s\n", rcPath)
+	}
+	fmt.Printf("\nTo apply changes, run:\n  source %s\n", rcPath)
+
+	return nil
+}
+
+func installFallback(root *cobra.Command, base, shell string) error {
+	bashPath := filepath.Join(base, "pea.bash")
+	zshPath := filepath.Join(base, "_pea")
+
+	f1, err := os.Create(bashPath)
+	if err != nil {
+		fmt.Printf("Warning: failed to create %s: %v\n", bashPath, err)
+	} else {
+		if err := root.GenBashCompletion(f1); err != nil {
+			fmt.Printf("Warning: failed to generate bash completion: %v\n", err)
+		}
+		f1.Close()
+	}
+
+	f2, err := os.Create(zshPath)
+	if err != nil {
+		fmt.Printf("Warning: failed to create %s: %v\n", zshPath, err)
+	} else {
+		if err := root.GenZshCompletion(f2); err != nil {
+			fmt.Printf("Warning: failed to generate zsh completion: %v\n", err)
+		}
+		f2.Close()
+	}
+
+	fmt.Printf("Unknown shell '%s'. Installed both scripts to %s\n", shell, base)
+	fmt.Printf("Add the relevant line to your config:\n")
+	fmt.Printf("Bash: source %s\n", bashPath)
+	fmt.Printf("Zsh:  fpath=(%s $fpath); autoload -U compinit; compinit\n", base)
+
+	return nil
 }
 
 func updateShellConfig(path, command string) error {
@@ -151,5 +179,6 @@ func updateShellConfig(path, command string) error {
 		s += "\n"
 	}
 	s += block + "\n"
+
 	return os.WriteFile(path, []byte(s), 0o644)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
 	"pea/internal/app"
 	"pea/platform"
 
@@ -20,6 +21,7 @@ func openEditor(cmd *cobra.Command, path string) error {
 			c.Stdin = os.Stdin
 			c.Stdout = cmd.OutOrStdout()
 			c.Stderr = cmd.ErrOrStderr()
+
 			if err := c.Run(); err != nil {
 				return fmt.Errorf("launching BROWSER failed: %w", err)
 			}
@@ -38,6 +40,7 @@ func openEditor(cmd *cobra.Command, path string) error {
 	c.Stdin = os.Stdin
 	c.Stdout = cmd.OutOrStdout()
 	c.Stderr = cmd.ErrOrStderr()
+
 	return c.Run()
 }
 
