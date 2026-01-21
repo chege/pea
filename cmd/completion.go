@@ -86,13 +86,25 @@ func addCompletionCommand(root *cobra.Command) {
 					bashPath := filepath.Join(base, "pea.bash")
 					zshPath := filepath.Join(base, "_pea")
 
-					f1, _ := os.Create(bashPath)
-					root.GenBashCompletion(f1)
-					f1.Close()
+					f1, err := os.Create(bashPath)
+					if err != nil {
+						fmt.Printf("Warning: failed to create %s: %v\n", bashPath, err)
+					} else {
+						if err := root.GenBashCompletion(f1); err != nil {
+							fmt.Printf("Warning: failed to generate bash completion: %v\n", err)
+						}
+						f1.Close()
+					}
 
-					f2, _ := os.Create(zshPath)
-					root.GenZshCompletion(f2)
-					f2.Close()
+					f2, err := os.Create(zshPath)
+					if err != nil {
+						fmt.Printf("Warning: failed to create %s: %v\n", zshPath, err)
+					} else {
+						if err := root.GenZshCompletion(f2); err != nil {
+							fmt.Printf("Warning: failed to generate zsh completion: %v\n", err)
+						}
+						f2.Close()
+					}
 
 					fmt.Printf("Unknown shell '%s'. Installed both scripts to %s\n", shell, base)
 					fmt.Printf("Add the relevant line to your config:\n")

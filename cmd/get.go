@@ -34,7 +34,9 @@ func addGetCommand(root *cobra.Command) {
 
 			// If stdout is a TTY, copy to clipboard
 			if isTTY() {
-				_ = copyToClipboard(string(b))
+				if err := copyToClipboard(string(b)); err != nil {
+					cmd.PrintErrf("warning: failed to copy to clipboard: %v\n", err)
+				}
 			}
 
 			return nil
