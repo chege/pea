@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"os"
 	"pea/internal/app"
 	"pea/platform"
 
@@ -44,15 +43,6 @@ func addGetCommand(root *cobra.Command) {
 
 	cmd.Flags().StringVar(&rev, "rev", "", "read entry content from a specific git ref")
 	root.AddCommand(cmd)
-}
-
-func isTTY() bool {
-	fi, err := os.Stdout.Stat()
-	if err != nil {
-		return false
-	}
-
-	return (fi.Mode() & os.ModeCharDevice) != 0
 }
 
 func copyToClipboard(s string) error {
