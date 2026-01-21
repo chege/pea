@@ -49,7 +49,7 @@ func addCompletionCommand(root *cobra.Command) {
 					// Patch .zshrc
 					rcPath := filepath.Join(home, ".zshrc")
 					cfgLine := fmt.Sprintf("fpath=(%s $fpath); autoload -U compinit; compinit", base)
-					if err := appendIfMissing(rcPath, cfgLine); err != nil {
+					if err := updateShellConfig(rcPath, cfgLine); err != nil {
 						fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
 					} else {
 						fmt.Printf("Updated %s\n", rcPath)
@@ -74,7 +74,7 @@ func addCompletionCommand(root *cobra.Command) {
 					// Check .bash_profile on Mac if .bashrc doesn't exist?
 					// stick to standard .bashrc for now.
 					cfgLine := fmt.Sprintf("source %s", path)
-					if err := appendIfMissing(rcPath, cfgLine); err != nil {
+					if err := updateShellConfig(rcPath, cfgLine); err != nil {
 						fmt.Printf("Warning: failed to update %s: %v\n", rcPath, err)
 					} else {
 						fmt.Printf("Updated %s\n", rcPath)
@@ -108,29 +108,36 @@ func addCompletionCommand(root *cobra.Command) {
 	root.AddCommand(cmd)
 }
 
-func appendIfMissing(path, text string) error {
+func updateShellConfig(path, command string) error {
+	startMarker := "# PEA_COMPLETION_START"
+	endMarker := "# PEA_COMPLETION_END"
+	block := fmt.Sprintf("%s\n%s\n%s", startMarker, command, endMarker)
+
 	content, err := os.ReadFile(path)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil {
+		if os.IsNotExist(err) {
+			return os.WriteFile(path, []byte(block+"\n"), 0o644)
+		}
 		return err
 	}
 	s := string(content)
-	if strings.Contains(s, text) {
-		return nil // Already present
+
+	startIndex := strings.Index(s, startMarker)
+	endIndex := strings.Index(s, endMarker)
+
+	if startIndex != -1 && endIndex != -1 && endIndex > startIndex {
+		// Replace existing block
+		before := s[:startIndex]
+		after := s[endIndex+len(endMarker):]
+		// Clean up potential double newlines if we remove a block
+		newContent := strings.TrimRight(before, "\n") + "\n" + block + "\n" + strings.TrimLeft(after, "\n")
+		return os.WriteFile(path, []byte(newContent), 0o644)
 	}
 
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
+	// Append
 	if len(s) > 0 && !strings.HasSuffix(s, "\n") {
-		if _, err := f.WriteString("\n"); err != nil {
-			return err
-		}
+		s += "\n"
 	}
-	if _, err := f.WriteString(text + "\n"); err != nil {
-		return err
-	}
-	return nil
+	s += block + "\n"
+	return os.WriteFile(path, []byte(s), 0o644)
 }
